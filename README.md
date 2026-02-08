@@ -117,13 +117,12 @@ To enable features like shareable links and usage analytics, configure Firebase:
 
 ## 🌐 Deployment
 
-### Deploy to Vercel (Recommended)
+### Deploy to Firebase (Recommended)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/bharathvbcr/Whimsical-Love)
-
-### Deploy to Netlify
-
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/bharathvbcr/Whimsical-Love)
+```bash
+npm run build
+firebase deploy
+```
 
 ### Manual Build
 
@@ -133,7 +132,7 @@ To build the project for static hosting:
 npm run build
 ```
 
-The output will be in the `dist/` directory, ready to be uploaded to any static hosting service.
+The output will be in the `dist/` directory.
 
 ---
 
