@@ -30,3 +30,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Agent files
+CLAUDE.md
+.gemini/
+.claude/
+.spec-flow/
+specs/
+epics/
