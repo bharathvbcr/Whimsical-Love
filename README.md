@@ -5,7 +5,7 @@
 
 **A beautiful, animated proposal website to ask your special someone the most important question.**
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live%20Preview-ff6b9d?style=for-the-badge)](https://whimsical-love.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Demo-Live%20Preview-ff6b9d?style=for-the-badge)](https://whimsical-love.web.app)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](./LICENSE)
 [![Made with Love](https://img.shields.io/badge/Made%20with-❤️-red?style=for-the-badge)](https://github.com/bharathvbcr)
 [![Animations](https://img.shields.io/badge/Animations-60FPS%20Smooth-8b5cf6?style=for-the-badge)](https://www.framer.com/motion/)
@@ -42,27 +42,27 @@
 
 ### Installation
 
-1.  **Clone the repository:**
+1. **Clone the repository:**
 
     ```bash
     git clone https://github.com/bharathvbcr/Whimsical-Love.git
     cd Whimsical-Love
     ```
 
-2.  **Install dependencies:**
+2. **Install dependencies:**
 
     ```bash
     npm install
     ```
 
-3.  **Run the Setup Wizard:**
+3. **Run the Setup Wizard:**
     This interactive tool will help you customize names, dates, and themes quickly.
 
     ```bash
     npm run setup
     ```
 
-4.  **Start the development server:**
+4. **Start the development server:**
 
     ```bash
     npm run dev
@@ -79,6 +79,7 @@ You have two main ways to personalize the experience:
 ### Option A: The Setup Wizard (Recommended)
 
 Run `npm run setup` in your terminal. This wizard guides you through setting:
+
 - Partner's Name & Your Name
 - Key Dates (Start of relationship, Proposal date)
 - Color Theme
@@ -92,11 +93,11 @@ For deeper customization (adding photos, specific milestones, quiz questions), e
 
 **Key areas to customize:**
 
-1.  **Personal Details**: Update `personalization` object.
-2.  **Theme**: Change `themeConfig`.
-3.  **Photos**: Add images to `public/photos/` and update `photoMemories`.
-4.  **Story**: Edit `journeyMilestones`, `storyPages`, `stickyNotes`, etc.
-5.  **Music**: Place your song in `public/music/` and update `musicConfig`.
+1. **Personal Details**: Update `personalization` object.
+2. **Theme**: Change `themeConfig`.
+3. **Photos**: Add images to `public/photos/` and update `photoMemories`.
+4. **Story**: Edit `journeyMilestones`, `storyPages`, `stickyNotes`, etc.
+5. **Music**: Place your song in `public/music/` and update `musicConfig`.
 
 Refer to [CUSTOMIZATION.md](./CUSTOMIZATION.md) for a comprehensive guide.
 
@@ -106,9 +107,9 @@ Refer to [CUSTOMIZATION.md](./CUSTOMIZATION.md) for a comprehensive guide.
 
 To enable features like shareable links and usage analytics, configure Firebase:
 
-1.  Create a project in the [Firebase Console](https://console.firebase.google.com/).
-2.  Register a Web App and copy the configuration.
-3.  Update `lib/firebase.ts` with your config keys.
+1. Create a project in the [Firebase Console](https://console.firebase.google.com/).
+2. Register a Web App and copy the configuration.
+3. Update `lib/firebase.ts` with your config keys.
 
     > **Security Note:** Ideally, use environment variables (`.env`) for these keys in a production environment to keep them secure.
 
@@ -181,12 +182,12 @@ whimsical-proposal/
 
 We welcome contributions! If you have ideas for new animations, features, or themes:
 
-1.  **Fork** the repository.
-2.  **Clone** your fork locally.
-3.  **Create a new branch** (`git checkout -b feature/AmazingFeature`).
-4.  **Commit** your changes (`git commit -m 'Add some AmazingFeature'`).
-5.  **Push** to the branch (`git push origin feature/AmazingFeature`).
-6.  **Open a Pull Request**.
+1. **Fork** the repository.
+2. **Clone** your fork locally.
+3. **Create a new branch** (`git checkout -b feature/AmazingFeature`).
+4. **Commit** your changes (`git commit -m 'Add some AmazingFeature'`).
+5. **Push** to the branch (`git push origin feature/AmazingFeature`).
+6. **Open a Pull Request**.
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for more detailed guidelines.
 
