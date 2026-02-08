@@ -1,0 +1,35 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none"
+    xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <!-- Gradients for 3D effect -->
+        <linearGradient id="heartMain" x1="32" y1="10" x2="32" y2="54" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="#FB7185"/>
+            <stop offset="100%" stop-color="#E11D48"/>
+        </linearGradient>
+
+        <linearGradient id="heartHighlight" x1="20" y1="15" x2="40" y2="30" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stop-color="white" stop-opacity="0.6"/>
+            <stop offset="100%" stop-color="white" stop-opacity="0"/>
+        </linearGradient>
+
+        <filter id="dropShadow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+            <feOffset dx="0" dy="2" result="offsetblur"/>
+            <feComponentTransfer>
+                <feFuncA type="linear" slope="0.3"/>
+            </feComponentTransfer>
+            <feMerge>
+                <feMergeNode/>
+                <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+        </filter>
+    </defs>
+
+    <!-- 3D Heart Shape -->
+    <g filter="url(#dropShadow)">
+        <path d="M32 58C32 58 58 44 58 26C58 17 51 10 42 10C37 10 32 15 32 15C32 15 27 10 22 10C13 10 6 17 6 26C6 44 32 58 32 58Z" fill="url(#heartMain)"/>
+
+        <!-- Highlight for 3D volume -->
+        <path d="M15 24C15 18 19 14 24 14C27 14 30 16 32 15C25 15 15 20 15 24Z" fill="url(#heartHighlight)"/>
+    </g>
+</svg>
