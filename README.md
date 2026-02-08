@@ -33,21 +33,6 @@
 
 ---
 
-## 📸 Visual Preview
-
-> *Animations so smooth, they'll skip a beat.*
-
-<div align="center">
-  <!-- 
-    TODO: Add a screen recording of your proposal here! 
-    Recommended: Use Screen Studio or OBS to record a high-quality GIF/MP4.
-  -->
-  <img src="public/photos/preview-placeholder.jpg" alt="Preview of Smooth Animations" width="100%" style="border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);" />
-  <p><em>(Add your own demo GIF here to showcase the 60FPS animations)</em></p>
-</div>
-
----
-
 ## 🚀 Quick Start
 
 ### Prerequisites
