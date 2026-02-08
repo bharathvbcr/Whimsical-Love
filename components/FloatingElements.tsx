@@ -25,8 +25,9 @@ const DustOverlay: React.FC = () => {
     window.addEventListener('resize', handleResize);
     handleResize();
 
-    // Particle Config
-    const particleCount = 60;
+    // Particle Config - Reduced for mobile
+    const isMobile = window.innerWidth < 768;
+    const particleCount = isMobile ? 30 : 60;
     const particles: { x: number; y: number; size: number; speedX: number; speedY: number; opacity: number; fadeSpeed: number }[] = [];
 
     for (let i = 0; i < particleCount; i++) {
@@ -110,7 +111,7 @@ const GlowingOrbs: React.FC = () => {
           x: [0, 50, 0]
         }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-rose-200/30 rounded-full blur-[100px]"
+        className="absolute -top-20 -left-20 w-[300px] h-[300px] md:w-[500px] md:h-[500px] bg-rose-200/30 rounded-full blur-[60px] md:blur-[100px]"
       />
 
       {/* Orb 2: Bottom Right Gold */}
@@ -122,7 +123,7 @@ const GlowingOrbs: React.FC = () => {
           x: [0, -50, 0]
         }}
         transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-        className="absolute top-1/2 -right-40 w-[600px] h-[600px] bg-amber-100/30 rounded-full blur-[120px]"
+        className="absolute top-1/2 -right-40 w-[400px] h-[400px] md:w-[600px] md:h-[600px] bg-amber-100/30 rounded-full blur-[80px] md:blur-[120px]"
       />
 
       {/* Orb 3: Middle Lavender */}
@@ -132,7 +133,7 @@ const GlowingOrbs: React.FC = () => {
           opacity: [0.1, 0.3, 0.1],
         }}
         transition={{ duration: 15, repeat: Infinity, ease: "easeInOut", delay: 2 }}
-        className="absolute bottom-0 left-1/3 w-[400px] h-[400px] bg-purple-200/20 rounded-full blur-[80px]"
+        className="absolute bottom-0 left-1/3 w-[250px] h-[250px] md:w-[400px] md:h-[400px] bg-purple-200/20 rounded-full blur-[50px] md:blur-[80px]"
       />
     </div>
   );

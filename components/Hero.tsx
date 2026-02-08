@@ -100,7 +100,9 @@ export const Hero: React.FC = () => {
 
   useEffect(() => {
     const timer = setTimeout(() => {
-        setHeroFloatingElements(Array.from({ length: 40 }).map((_, i) => ({
+        const isMobile = window.innerWidth < 768;
+        
+        setHeroFloatingElements(Array.from({ length: isMobile ? 15 : 40 }).map((_, i) => ({
         id: i,
         left: Math.random() * 120 - 10,
         top: Math.random() * 120 - 10,
@@ -113,7 +115,7 @@ export const Hero: React.FC = () => {
         moveY: Math.random() * 50 - 25,
         })));
 
-        setGlitterParticles(Array.from({ length: 50 }).map((_, i) => ({
+        setGlitterParticles(Array.from({ length: isMobile ? 20 : 50 }).map((_, i) => ({
         id: `glitter-${i}`,
         left: Math.random() * 120 - 10,
         top: Math.random() * 120 - 10,

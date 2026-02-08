@@ -28,6 +28,7 @@ export const SmoothScroll: React.FC<{ children: React.ReactNode }> = ({ children
                 smoothWheel: true,
                 wheelMultiplier: 1,
                 touchMultiplier: 2,
+                syncTouch: false, // Don't sync touch scroll with JS to prevent jitter
             }}
         >
             {children}
