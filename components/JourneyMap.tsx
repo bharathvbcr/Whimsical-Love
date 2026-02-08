@@ -86,9 +86,9 @@ export const JourneyMap: React.FC = () => {
                 </motion.p>
             </div>
 
-            <div className="relative w-full max-w-5xl mx-auto h-[1200px] md:h-[1400px] bg-slate-50/30 rounded-[3rem] border-8 border-white shadow-2xl overflow-hidden backdrop-blur-sm">
-                {/* Vintage Paper Texture Overlay */}
-                <div className="absolute inset-0 opacity-40 mix-blend-multiply pointer-events-none" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/paper-fibers.png")' }}></div>
+            <div className="relative w-full max-w-5xl mx-auto h-[1200px] md:h-[1400px] bg-slate-50/30 rounded-[3rem] border-8 border-white shadow-2xl overflow-hidden backdrop-blur-none md:backdrop-blur-sm">
+                {/* Vintage Paper Texture Overlay - Hidden on mobile for performance */}
+                <div className="absolute inset-0 opacity-40 mix-blend-multiply pointer-events-none hidden md:block" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/paper-fibers.png")' }}></div>
 
                 {/* Background Grid */}
                 <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'radial-gradient(#000 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
@@ -172,7 +172,7 @@ export const JourneyMap: React.FC = () => {
                                     <p className="font-sans text-sm text-slate-500 leading-relaxed italic">{m.description}</p>
                                 </div>
                                 {/* Decorative Tape */}
-                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-8 bg-rose-200/40 backdrop-blur-sm -rotate-2 border border-rose-300/20"></div>
+                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-16 h-8 bg-rose-200/40 md:backdrop-blur-sm -rotate-2 border border-rose-300/20"></div>
                             </div>
                         </motion.div>
                     </div>

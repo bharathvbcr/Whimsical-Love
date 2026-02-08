@@ -45,6 +45,8 @@ const PhotoCard: React.FC<{
                     <img
                         src={photo.src}
                         alt={photo.caption}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover"
                         onError={(e) => {
                             // Fallback for missing images

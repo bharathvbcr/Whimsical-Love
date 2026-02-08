@@ -297,7 +297,7 @@ const BookPage: React.FC<{
 
                 {/* Paper Texture */}
                 <div
-                    className="absolute inset-0 opacity-15 pointer-events-none mix-blend-multiply"
+                    className="absolute inset-0 opacity-15 pointer-events-none mix-blend-multiply hidden md:block"
                     style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/paper-fibers.png")' }}
                 />
 

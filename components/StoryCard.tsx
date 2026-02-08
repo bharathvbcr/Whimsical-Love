@@ -19,7 +19,8 @@ export const StoryCard: React.FC<StoryCardProps> = ({ title, text, delay = 0, ro
       }}
       viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.8, delay, type: "spring", bounce: 0.4 }}
-      className="bg-white/90 backdrop-blur-md p-8 max-w-md w-full shadow-xl shadow-rose-100/50 hover:shadow-2xl hover:shadow-rose-300/40 transition-shadow duration-300 hand-drawn-border border-2 border-rose-100 relative group cursor-pointer"
+      style={{ willChange: 'transform' }}
+      className="bg-white/90 md:backdrop-blur-md p-8 max-w-md w-full shadow-xl shadow-rose-100/50 hover:shadow-2xl hover:shadow-rose-300/40 transition-shadow duration-300 hand-drawn-border border-2 border-rose-100 relative group cursor-pointer"
     >
         {/* Decorative Tape */}
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-24 h-8 bg-rose-200/50 -rotate-2 transform" style={{ clipPath: "polygon(2% 0, 98% 0, 100% 100%, 0% 100%)" }}></div>
