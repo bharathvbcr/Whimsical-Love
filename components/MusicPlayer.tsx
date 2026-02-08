@@ -6,14 +6,17 @@ import { useExperience } from './AutoScrollContext';
 
 export const MusicPlayer: React.FC = () => {
   const { musicConfig } = useContent();
-  const DEFAULT_AUDIO_URL = musicConfig.url;
 
-  // Get audioRef from unified context
-  const { audioRef, isMusicPlaying, hasStarted } = useExperience();
+  // Get audioRef and centralized music state from unified context
+  const { 
+    audioRef, 
+    isMusicPlaying, 
+    customAudioUrl, 
+    setCustomAudioUrl 
+  } = useExperience();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [volume, setVolume] = useState(0.7);
-  const [customAudioUrl, setCustomAudioUrl] = useState<string | null>(null);
   const [showControls, setShowControls] = useState(false);
   const [isFading, setIsFading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -98,15 +101,8 @@ export const MusicPlayer: React.FC = () => {
     }
   };
 
-  const currentAudioUrl = customAudioUrl || DEFAULT_AUDIO_URL;
-
   return (
     <div className="fixed bottom-6 left-6 z-50">
-      <audio
-        ref={audioRef}
-        loop
-        src={currentAudioUrl}
-      />
       <input
         ref={fileInputRef}
         type="file"
@@ -184,7 +180,7 @@ export const MusicPlayer: React.FC = () => {
             )}
           </div>
           <span className="font-sans text-sm font-medium hidden md:block">
-            {isPlaying ? (customAudioUrl ? musicConfig.label : musicConfig.label) : 'Play Music'}
+            {isPlaying ? (customAudioUrl ? 'Custom Song' : musicConfig.label) : 'Play Music'}
           </span>
 
           {/* Visualizer bars */}

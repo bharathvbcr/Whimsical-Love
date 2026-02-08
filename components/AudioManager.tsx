@@ -7,8 +7,10 @@ import { useContent } from '../hooks/useContent';
  * and wires it to the ExperienceContext's audioRef.
  */
 export const AudioManager: React.FC = () => {
-    const { audioRef } = useExperience();
+    const { audioRef, customAudioUrl } = useExperience();
     const { musicConfig } = useContent();
+
+    const currentUrl = customAudioUrl || musicConfig.url;
 
     // This component renders a hidden audio element and links it to the context
     return (
@@ -16,7 +18,7 @@ export const AudioManager: React.FC = () => {
             ref={audioRef}
             loop
             preload="auto"
-            src={musicConfig.url}
+            src={currentUrl}
             className="hidden"
         />
     );

@@ -13,6 +13,8 @@ interface ExperienceContextType {
     // Music state (unified)
     isMusicPlaying: boolean;
     audioRef: RefObject<HTMLAudioElement | null>;
+    customAudioUrl: string | null;
+    setCustomAudioUrl: (url: string | null) => void;
 
     // Master control
     hasStarted: boolean;
@@ -28,6 +30,7 @@ export const ExperienceProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     // Music state
     const [isMusicPlaying, setIsMusicPlaying] = useState(false);
+    const [customAudioUrl, setCustomAudioUrl] = useState<string | null>(null);
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
     // Master state
@@ -99,6 +102,8 @@ export const ExperienceProvider: React.FC<{ children: React.ReactNode }> = ({ ch
             unregisterPause,
             isMusicPlaying,
             audioRef,
+            customAudioUrl,
+            setCustomAudioUrl,
             hasStarted,
             startExperience,
         }}>
