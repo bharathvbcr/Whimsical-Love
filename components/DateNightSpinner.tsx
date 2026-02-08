@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { RefreshCw, Ticket } from 'lucide-react';
+import { useAutoScroll } from './AutoScrollContext';
 
 const activities = ["Stargazing Picnic", "Arcade Battle", "Sunset Beach Walk", "Movie Marathon", "Comedy Club", "Build a Fort"];
 const foods = ["Italian Bistro", "Taco Fiesta", "Sushi Boat", "Ice Cream Sundaes", "Midnight Pizza", "Fancy Cheese Board"];
@@ -10,6 +11,49 @@ export const DateNightSpinner: React.FC = () => {
     const [result, setResult] = useState({ activity: "???", food: "???", vibe: "???" });
     const [isSpinning, setIsSpinning] = useState(false);
     const [couponGenerated, setCouponGenerated] = useState(false);
+
+    // Movie Mode Integration
+    const { isPlaying, registerPause, unregisterPause } = useAutoScroll();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isInView = useInView(containerRef, { amount: 0.5 });
+    const [hasAutoSpun, setHasAutoSpun] = useState(false);
+
+    // Auto-spin effect for Movie Mode
+    useEffect(() => {
+        if (isPlaying && isInView && !hasAutoSpun && !couponGenerated && !isSpinning) {
+            registerPause('spinner');
+
+            let interval: NodeJS.Timeout;
+            const startDelay = setTimeout(() => {
+                // Trigger the spin
+                setIsSpinning(true);
+
+                let count = 0;
+                interval = setInterval(() => {
+                    setResult({
+                        activity: activities[Math.floor(Math.random() * activities.length)],
+                        food: foods[Math.floor(Math.random() * foods.length)],
+                        vibe: vibes[Math.floor(Math.random() * vibes.length)]
+                    });
+                    count++;
+                    if (count > 15) {
+                        clearInterval(interval);
+                        setIsSpinning(false);
+                        setCouponGenerated(true);
+                        setHasAutoSpun(true);
+                        // Wait for user to see the coupon
+                        setTimeout(() => unregisterPause('spinner'), 4000);
+                    }
+                }, 100);
+            }, 1500);
+
+            return () => {
+                clearTimeout(startDelay);
+                if (interval) clearInterval(interval);
+                unregisterPause('spinner');
+            };
+        }
+    }, [isPlaying, isInView, hasAutoSpun, couponGenerated, isSpinning, registerPause, unregisterPause]);
 
     const spin = () => {
         if (isSpinning) return;
@@ -33,10 +77,10 @@ export const DateNightSpinner: React.FC = () => {
     };
 
     return (
-        <section className="py-24 bg-rose-50 relative overflow-hidden">
-             {/* Background decorative blobs */}
-             <div className="absolute top-0 left-0 w-64 h-64 bg-yellow-100 rounded-full blur-3xl opacity-50 -translate-x-1/2 -translate-y-1/2"></div>
-             <div className="absolute bottom-0 right-0 w-80 h-80 bg-rose-200 rounded-full blur-3xl opacity-50 translate-x-1/2 translate-y-1/2"></div>
+        <section ref={containerRef} className="py-24 bg-rose-50 relative overflow-hidden">
+            {/* Background decorative blobs */}
+            <div className="absolute top-0 left-0 w-64 h-64 bg-yellow-100 rounded-full blur-3xl opacity-50 -translate-x-1/2 -translate-y-1/2"></div>
+            <div className="absolute bottom-0 right-0 w-80 h-80 bg-rose-200 rounded-full blur-3xl opacity-50 translate-x-1/2 translate-y-1/2"></div>
 
             <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
                 <h2 className="font-script text-5xl md:text-6xl text-rose-900 mb-4">Our Next Adventure</h2>
@@ -70,7 +114,7 @@ export const DateNightSpinner: React.FC = () => {
                         <RefreshCw className={`w-6 h-6 ${isSpinning ? 'animate-spin' : ''}`} />
                         {isSpinning ? "Picking..." : "Spin For A Date!"}
                     </motion.button>
-                    
+
                     {/* The Coupon Result */}
                     <AnimatePresence>
                         {couponGenerated && (
@@ -82,9 +126,9 @@ export const DateNightSpinner: React.FC = () => {
                                 className="mt-12 max-w-md mx-auto relative group cursor-pointer"
                             >
                                 <div className="absolute inset-0 bg-yellow-400 rounded-xl rotate-2 group-hover:rotate-6 transition-transform"></div>
-                                <div className="relative bg-white border-2 border-slate-800 rounded-xl p-6 text-center shadow-lg" 
-                                     style={{ backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)', backgroundSize: '10px 10px' }}>
-                                    
+                                <div className="relative bg-white border-2 border-slate-800 rounded-xl p-6 text-center shadow-lg"
+                                    style={{ backgroundImage: 'radial-gradient(#e5e7eb 1px, transparent 1px)', backgroundSize: '10px 10px' }}>
+
                                     {/* Ticket Cutouts */}
                                     <div className="absolute top-1/2 -left-3 w-6 h-6 bg-rose-50 border-r-2 border-slate-800 rounded-full"></div>
                                     <div className="absolute top-1/2 -right-3 w-6 h-6 bg-rose-50 border-l-2 border-slate-800 rounded-full"></div>

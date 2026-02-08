@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useMotionValue, useTransform, useSpring } from 'framer-motion';
 import { Heart, Star, Sparkles } from 'lucide-react';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../hooks/useContent';
 import { Logo } from './Logo';
+import { CountdownTimer } from './CountdownTimer';
 
 export const Hero: React.FC = () => {
   const { personalization } = useContent();
@@ -93,30 +94,38 @@ export const Hero: React.FC = () => {
     return () => clearTimeout(timer);
   }, [displayText, isDeleting, loopNum, phrases, typingSpeed]);
 
-  // Floating Elements Logic
-  const heroFloatingElements = Array.from({ length: 40 }).map((_, i) => ({
-    id: i,
-    left: Math.random() * 120 - 10,
-    top: Math.random() * 120 - 10,
-    size: Math.random() * 0.8 + 0.4,
-    duration: Math.random() * 4 + 3,
-    delay: Math.random() * 2,
-    type: i % 3,
-    color: i % 3 === 0 ? 'text-rose-300' : (i % 3 === 1 ? 'text-rose-200' : 'text-lavender-300'),
-    moveX: Math.random() * 50 - 25,
-    moveY: Math.random() * 50 - 25,
-  }));
+  // Floating Elements Logic - Hydration safe
+  const [heroFloatingElements, setHeroFloatingElements] = useState<any[]>([]);
+  const [glitterParticles, setGlitterParticles] = useState<any[]>([]);
 
-  const glitterParticles = Array.from({ length: 50 }).map((_, i) => ({
-    id: `glitter-${i}`,
-    left: Math.random() * 120 - 10,
-    top: Math.random() * 120 - 10,
-    size: Math.random() * 6 + 2,
-    color: ['bg-yellow-200', 'bg-rose-200', 'bg-white', 'bg-lavender-200'][Math.floor(Math.random() * 4)],
-    shape: Math.random() > 0.5 ? 'rounded-full' : 'rounded-sm',
-    duration: Math.random() * 3 + 2,
-    delay: Math.random() * 5,
-  }));
+  useEffect(() => {
+    const timer = setTimeout(() => {
+        setHeroFloatingElements(Array.from({ length: 40 }).map((_, i) => ({
+        id: i,
+        left: Math.random() * 120 - 10,
+        top: Math.random() * 120 - 10,
+        size: Math.random() * 0.8 + 0.4,
+        duration: Math.random() * 4 + 3,
+        delay: Math.random() * 2,
+        type: i % 3,
+        color: i % 3 === 0 ? 'text-rose-300' : (i % 3 === 1 ? 'text-rose-200' : 'text-lavender-300'),
+        moveX: Math.random() * 50 - 25,
+        moveY: Math.random() * 50 - 25,
+        })));
+
+        setGlitterParticles(Array.from({ length: 50 }).map((_, i) => ({
+        id: `glitter-${i}`,
+        left: Math.random() * 120 - 10,
+        top: Math.random() * 120 - 10,
+        size: Math.random() * 6 + 2,
+        color: ['bg-yellow-200', 'bg-rose-200', 'bg-white', 'bg-lavender-200'][Math.floor(Math.random() * 4)],
+        shape: Math.random() > 0.5 ? 'rounded-full' : 'rounded-sm',
+        duration: Math.random() * 3 + 2,
+        delay: Math.random() * 5,
+        })));
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   return (
     <section
@@ -216,6 +225,7 @@ export const Hero: React.FC = () => {
           <motion.span
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            style={{ transform: 'translateZ(1px)' }}
             transition={{ duration: 1, delay: 0.2, ease: "easeOut" }}
             className="block mb-2"
           >
@@ -224,6 +234,7 @@ export const Hero: React.FC = () => {
           <motion.span
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            style={{ transform: 'translateZ(1px)' }}
             transition={{ duration: 1, delay: 0.5, ease: "easeOut" }}
             className="block text-rose-400 text-5xl md:text-7xl mb-4"
           >
@@ -232,6 +243,7 @@ export const Hero: React.FC = () => {
           <motion.span
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
+            style={{ transform: 'translateZ(1px)' }}
             transition={{ duration: 1, delay: 0.8, ease: "easeOut" }}
             className="block"
           >
@@ -241,6 +253,7 @@ export const Hero: React.FC = () => {
 
         <motion.p
           className="font-sans text-xl md:text-2xl text-slate-600 font-light max-w-2xl mx-auto leading-relaxed h-20"
+          style={{ transform: 'translateZ(1px)' }}
         >
           ...everything changed, and <br />
           <span className="inline-flex items-center">
@@ -252,13 +265,15 @@ export const Hero: React.FC = () => {
             />
           </span>
         </motion.p>
+
+        <CountdownTimer />
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 2, duration: 1 }}
-        className="absolute bottom-10 animate-bounce"
+        className="absolute bottom-6 animate-bounce z-20"
       >
         <div className="flex flex-col items-center gap-2 text-rose-300">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">

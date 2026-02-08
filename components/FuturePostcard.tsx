@@ -1,12 +1,38 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Mail, Stamp } from 'lucide-react';
+import { useAutoScroll } from './AutoScrollContext';
 
 export const FuturePostcard: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
 
+    // Movie Mode Integration
+    const { isPlaying, registerPause, unregisterPause } = useAutoScroll();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isInView = useInView(containerRef, { amount: 0.5 });
+    const [hasAutoOpened, setHasAutoOpened] = useState(false);
+
+    // Auto-open effect for Movie Mode
+    useEffect(() => {
+        if (isPlaying && isInView && !hasAutoOpened && !isOpen) {
+            registerPause('postcard');
+
+            const openDelay = setTimeout(() => {
+                setIsOpen(true);
+                setHasAutoOpened(true);
+                // Wait for user to read the postcard
+                setTimeout(() => unregisterPause('postcard'), 6000);
+            }, 1500);
+
+            return () => {
+                clearTimeout(openDelay);
+                unregisterPause('postcard');
+            };
+        }
+    }, [isPlaying, isInView, hasAutoOpened, isOpen, registerPause, unregisterPause]);
+
     return (
-        <section className="py-32 bg-sky-50 relative overflow-hidden flex flex-col items-center justify-center">
+        <section ref={containerRef} className="py-32 bg-sky-50 relative overflow-hidden flex flex-col items-center justify-center">
             {/* Background Clouds */}
             <div className="absolute top-20 left-10 text-white/40 animate-float delay-0"><Cloud size={80} /></div>
             <div className="absolute top-40 right-20 text-white/60 animate-float delay-1000"><Cloud size={120} /></div>
@@ -34,14 +60,14 @@ export const FuturePostcard: React.FC = () => {
                                 <div className="text-white/20 font-bold text-6xl font-sans tracking-tighter">US</div>
                             </div>
                             <div className="w-4 h-32 bg-slate-800 mx-auto -mt-2"></div>
-                            
+
                             {/* Flag */}
-                            <motion.div 
+                            <motion.div
                                 className="absolute right-[-20px] top-10 w-4 h-24 bg-red-500 origin-bottom rounded-t-md z-0"
                                 animate={{ rotate: [0, -20, 0] }}
                                 transition={{ repeat: Infinity, duration: 3, repeatDelay: 1 }}
                             />
-                            
+
                             <div className="absolute -top-12 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-lg text-sky-600 font-bold animate-bounce whitespace-nowrap">
                                 You have mail! 📬
                             </div>
@@ -68,8 +94,8 @@ export const FuturePostcard: React.FC = () => {
                             <div className="absolute top-6 right-24 opacity-60 rotate-12">
                                 <div className="w-24 h-24 border-2 border-slate-800 rounded-full flex items-center justify-center">
                                     <div className="text-center text-xs font-mono font-bold leading-tight">
-                                        FUTURE POST<br/>
-                                        AUG 12<br/>
+                                        FUTURE POST<br />
+                                        AUG 12<br />
                                         2074
                                     </div>
                                 </div>
@@ -90,9 +116,9 @@ export const FuturePostcard: React.FC = () => {
                                     </p>
                                 </div>
                             </div>
-                            
+
                             {/* Close button */}
-                            <button 
+                            <button
                                 onClick={() => setIsOpen(false)}
                                 className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-sky-600 underline font-sans text-sm hover:text-sky-800"
                             >
@@ -111,6 +137,6 @@ const Cloud = ({ size }: { size: number }) => (
         <path d="M17.5,19c-3.037,0-5.5-2.463-5.5-5.5c0-1.056,0.306-2.039,0.83-2.868c-0.264-0.086-0.542-0.132-0.83-0.132
 		c-1.657,0-3,1.343-3,3c0,0.209,0.021,0.413,0.061,0.611C8.756,13.902,8.441,13.82,8.113,13.82c-2.209,0-4,1.791-4,4s1.791,4,4,4
 		h9.387C19.988,21.82,22,19.343,22,16.5C22,13.463,19.537,11,16.5,11S11,13.463,11,16.5"/>
-        <path d="M17.5,19c-3.037,0-5.5-2.463-5.5-5.5c0-3.037,2.463-5.5,5.5-5.5S23,10.463,23,13.5S20.537,19,17.5,19z" opacity="0.5"/>
+        <path d="M17.5,19c-3.037,0-5.5-2.463-5.5-5.5c0-3.037,2.463-5.5,5.5-5.5S23,10.463,23,13.5S20.537,19,17.5,19z" opacity="0.5" />
     </svg>
 );

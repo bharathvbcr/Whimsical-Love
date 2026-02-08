@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { RefreshCw } from 'lucide-react';
+import { useInView } from 'framer-motion';
+import { useAutoScroll } from './AutoScrollContext';
 
 interface Flower {
     x: number;
@@ -17,7 +18,56 @@ export const GardenSection: React.FC = () => {
     const [flowers, setFlowers] = useState<Flower[]>([]);
     const animationFrameId = useRef<number>(0);
 
-    const colors = ['#f43f5e', '#fb7185', '#fecdd3', '#fda4af', '#e11d48', '#be123c', '#fbbf24', '#fcd34d'];
+    const colors = useMemo(() => ['#f43f5e', '#fb7185', '#fecdd3', '#fda4af', '#e11d48', '#be123c', '#fbbf24', '#fcd34d'], []);
+
+    // Movie Mode Integration
+    const { isPlaying, registerPause, unregisterPause } = useAutoScroll();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isInView = useInView(containerRef, { amount: 0.5 });
+    const [hasAutoPlanted, setHasAutoPlanted] = useState(false);
+
+    // Auto-plant effect for Movie Mode
+    useEffect(() => {
+        if (isPlaying && isInView && !hasAutoPlanted && flowers.length === 0) {
+            registerPause('garden');
+
+            const canvas = canvasRef.current;
+            if (!canvas) return;
+
+            const rect = canvas.getBoundingClientRect();
+            let flowerCount = 0;
+            const maxFlowers = 8;
+            const interval: ReturnType<typeof setInterval> = setInterval(() => {
+                const x = 50 + Math.random() * (rect.width - 100);
+                const y = 80 + Math.random() * (rect.height - 160);
+
+                const newFlower: Flower = {
+                    x,
+                    y,
+                    size: Math.random() * 20 + 20,
+                    color: colors[Math.floor(Math.random() * colors.length)],
+                    petalCount: Math.floor(Math.random() * 5) + 5,
+                    rotation: Math.random() * Math.PI,
+                    growth: 0
+                };
+
+                setFlowers(prev => [...prev, newFlower]);
+                flowerCount++;
+
+                if (flowerCount >= maxFlowers) {
+                    clearInterval(interval);
+                    setHasAutoPlanted(true);
+                    // Wait for flowers to bloom
+                    setTimeout(() => unregisterPause('garden'), 2500);
+                }
+            }, 400);
+
+            return () => {
+                if (interval) clearInterval(interval);
+                unregisterPause('garden');
+            };
+        }
+    }, [isPlaying, isInView, hasAutoPlanted, flowers.length, colors, registerPause, unregisterPause]);
 
     useEffect(() => {
         const canvas = canvasRef.current;
@@ -69,7 +119,7 @@ export const GardenSection: React.FC = () => {
 
                 ctx.restore();
             });
-            
+
             animationFrameId.current = requestAnimationFrame(render);
         };
 
@@ -82,14 +132,14 @@ export const GardenSection: React.FC = () => {
         const canvas = canvasRef.current;
         if (!canvas) return;
         const rect = canvas.getBoundingClientRect();
-        
+
         let clientX, clientY;
         if ('touches' in e) {
-             clientX = e.touches[0].clientX;
-             clientY = e.touches[0].clientY;
+            clientX = e.touches[0].clientX;
+            clientY = e.touches[0].clientY;
         } else {
-             clientX = (e as React.MouseEvent).clientX;
-             clientY = (e as React.MouseEvent).clientY;
+            clientX = (e as React.MouseEvent).clientX;
+            clientY = (e as React.MouseEvent).clientY;
         }
 
         const x = clientX - rect.left;
@@ -109,8 +159,8 @@ export const GardenSection: React.FC = () => {
     };
 
     return (
-        <section className="py-24 bg-green-50 relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20" 
+        <section ref={containerRef} className="py-24 bg-green-50 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20"
                 style={{ backgroundImage: 'radial-gradient(#86efac 2px, transparent 2px)', backgroundSize: '30px 30px' }}>
             </div>
 
@@ -120,11 +170,11 @@ export const GardenSection: React.FC = () => {
             </div>
 
             <div className="relative w-full h-[500px] border-y-4 border-green-800/10 cursor-pointer touch-none bg-white/30 backdrop-blur-sm"
-                 onMouseDown={addFlower}
-                 onTouchStart={addFlower}
+                onMouseDown={addFlower}
+                onTouchStart={addFlower}
             >
                 <canvas ref={canvasRef} className="w-full h-full" />
-                
+
                 {flowers.length === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="bg-white/80 px-6 py-3 rounded-full shadow-lg animate-bounce text-green-600 font-hand font-bold text-xl">
@@ -135,7 +185,7 @@ export const GardenSection: React.FC = () => {
             </div>
 
             <div className="text-center mt-8">
-                <button 
+                <button
                     onClick={() => setFlowers([])}
                     className="flex items-center gap-2 mx-auto text-green-600 hover:text-green-800 transition-colors font-sans text-sm font-bold uppercase tracking-widest"
                 >

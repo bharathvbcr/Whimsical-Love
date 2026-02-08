@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useRef, RefObject } from 'react';
+import { useProposalConfig } from './ProposalConfig';
 
 interface ExperienceContextType {
     // Scroll state (from original AutoScrollContext)
@@ -53,6 +54,8 @@ export const ExperienceProvider: React.FC<{ children: React.ReactNode }> = ({ ch
 
     const isScrollPaused = pausers.size > 0;
 
+    const { config } = useProposalConfig();
+
     /**
      * Master entry point - starts both music and auto-scroll together.
      * This ensures the user interaction satisfies browser autoplay policies.
@@ -80,9 +83,11 @@ export const ExperienceProvider: React.FC<{ children: React.ReactNode }> = ({ ch
                 .catch(e => console.log("Audio play prevented:", e));
         }
 
-        // Start auto-scroll
-        setIsPlayingState(true);
-    }, []);
+        // Start auto-scroll only if enabled
+        if (config.enableAutoplay) {
+            setIsPlayingState(true);
+        }
+    }, [config.enableAutoplay]);
 
     return (
         <ExperienceContext.Provider value={{

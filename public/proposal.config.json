@@ -1,0 +1,23 @@
+{
+    "personalization": {
+        "partnerName": "Sarah",
+        "yourName": "James",
+        "relationshipStartDate": "2022-06-15",
+        "proposalDate": "",
+        "specialMessage": "I promise to never leave you. To love you through the seasons, to grow old by your side, and to cherish every single moment. You are my forever.",
+        "heroSubtitles": [
+            "time stood still.",
+            "I saw my future.",
+            "I knew you were the one.",
+            "my heart beat for you."
+        ]
+    },
+    "themeConfig": {
+        "primaryColor": "rose",
+        "accentColor": "rose"
+    },
+    "musicConfig": {
+        "url": "https://cdn.pixabay.com/download/audio/2022/02/10/audio_fc8c83a77b.mp3?filename=piano-moment-11634.mp3",
+        "label": "Our Song"
+    }
+}

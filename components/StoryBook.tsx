@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { BookOpen, Sparkles } from 'lucide-react';
 import { useAutoScroll } from './AutoScrollContext';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../hooks/useContent';
 
 // Enhanced spring configs for realistic paper physics
 const pageFlipSpring = {
@@ -54,6 +54,37 @@ const PageFlipIndicator: React.FC<{ isFlipping: boolean }> = ({ isFlipping }) =>
         )}
     </AnimatePresence>
 );
+
+// Extracted Particle Component
+const Particle: React.FC<{ x: number, y: number }> = ({ x, y }) => {
+    const [anim, setAnim] = useState({ y: 0, x: 0, rotate: 0 });
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setAnim({
+                y: Math.random() * 80 + 20,
+                x: (Math.random() - 0.5) * 60,
+                rotate: Math.random() * 360
+            });
+        }, 0);
+        return () => clearTimeout(timer);
+    }, []);
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0, x, y }}
+            animate={{
+                opacity: [0, 1, 0],
+                scale: [0, 1.5, 0],
+                y: y - anim.y,
+                x: x + anim.x,
+                rotate: anim.rotate
+            }}
+            transition={{ duration: 2, ease: "easeOut" }}
+            className="absolute w-1.5 h-1.5 bg-yellow-200 rounded-full pointer-events-none shadow-[0_0_10px_rgba(253,224,71,0.9)]"
+        />
+    );
+};
 
 // Interactive Cover Component with enhanced animations
 const CoverPageContent: React.FC<{ autoTrigger?: boolean }> = ({ autoTrigger }) => {
@@ -146,6 +177,7 @@ const CoverPageContent: React.FC<{ autoTrigger?: boolean }> = ({ autoTrigger }) 
 
             <motion.p
                 className="font-sans text-rose-200 relative z-10"
+                style={{ transform: 'translateZ(1px)' }}
                 animate={{ opacity: [0.8, 1, 0.8] }}
                 transition={{ duration: 2, repeat: Infinity }}
             >
@@ -155,6 +187,7 @@ const CoverPageContent: React.FC<{ autoTrigger?: boolean }> = ({ autoTrigger }) 
             {/* Enhanced click prompt with animated sparkles */}
             <motion.div
                 className="mt-8 text-sm uppercase tracking-widest text-rose-300/70 relative z-10 flex items-center justify-center gap-2"
+                style={{ transform: 'translateZ(1px)' }}
                 animate={{ opacity: [0.5, 1, 0.5] }}
                 transition={{ duration: 2, repeat: Infinity }}
             >
@@ -176,19 +209,7 @@ const CoverPageContent: React.FC<{ autoTrigger?: boolean }> = ({ autoTrigger }) 
             {/* Particle effects */}
             <AnimatePresence>
                 {particles.map((p) => (
-                    <motion.div
-                        key={p.id}
-                        initial={{ opacity: 0, scale: 0, x: p.x, y: p.y }}
-                        animate={{
-                            opacity: [0, 1, 0],
-                            scale: [0, 1.5, 0],
-                            y: p.y - Math.random() * 80 - 20,
-                            x: p.x + (Math.random() - 0.5) * 60,
-                            rotate: Math.random() * 360
-                        }}
-                        transition={{ duration: 2, ease: "easeOut" }}
-                        className="absolute w-1.5 h-1.5 bg-yellow-200 rounded-full pointer-events-none shadow-[0_0_10px_rgba(253,224,71,0.9)]"
-                    />
+                    <Particle key={p.id} x={p.x} y={p.y} />
                 ))}
             </AnimatePresence>
         </div>
@@ -224,6 +245,7 @@ const BookPage: React.FC<{
             style={{
                 transformStyle: 'preserve-3d',
                 backfaceVisibility: 'hidden',
+                willChange: 'transform',
                 boxShadow: `${shadowSpread}px 0 ${shadowSpread * 2}px rgba(0,0,0,${shadowIntensity})`,
             }}
         >
@@ -299,7 +321,7 @@ export const StoryBook: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(0);
     const [isFlipping, setIsFlipping] = useState(false);
     const containerRef = useRef<HTMLDivElement>(null);
-    const isInView = useInView(containerRef, { amount: 0.6 });
+    const isInView = useInView(containerRef, { amount: 0.5 });
 
     // Auto Scroll Integration
     const { isPlaying, registerPause, unregisterPause } = useAutoScroll();
@@ -322,6 +344,7 @@ export const StoryBook: React.FC = () => {
                     <div className="p-8 text-center flex flex-col items-center justify-center h-full">
                         <motion.p
                             className="font-script text-4xl text-rose-600 mb-4"
+                            style={{ transform: 'translateZ(1px)' }}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ delay: 0.3, duration: 0.8 }}
@@ -330,6 +353,7 @@ export const StoryBook: React.FC = () => {
                         </motion.p>
                         <motion.p
                             className="font-sans text-sm text-slate-400"
+                            style={{ transform: 'translateZ(1px)' }}
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 0.8, duration: 0.5 }}
@@ -347,6 +371,7 @@ export const StoryBook: React.FC = () => {
                 <div className="p-8 text-center flex flex-col items-center justify-center h-full">
                     <motion.p
                         className="font-hand text-2xl text-slate-800 leading-relaxed"
+                        style={{ transform: 'translateZ(1px)' }}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2, duration: 0.6 }}
@@ -383,8 +408,10 @@ export const StoryBook: React.FC = () => {
             registerPause('storybook');
 
             let page = 0;
+            let interval: NodeJS.Timeout;
+
             const startDelay = setTimeout(() => {
-                const interval = setInterval(() => {
+                interval = setInterval(() => {
                     page++;
                     if (page < pages.length) {
                         setIsFlipping(true);
@@ -396,12 +423,11 @@ export const StoryBook: React.FC = () => {
                         unregisterPause('storybook');
                     }
                 }, 2800); // Slightly longer for reading + animation
-
-                return () => clearInterval(interval);
             }, 2000);
 
             return () => {
                 clearTimeout(startDelay);
+                if (interval) clearInterval(interval);
                 unregisterPause('storybook');
             };
         }

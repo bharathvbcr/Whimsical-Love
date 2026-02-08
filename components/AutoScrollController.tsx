@@ -1,29 +1,38 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, FastForward, Turtle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLenis } from 'lenis/react';
 import { useAutoScroll } from './AutoScrollContext';
+import { useProposalConfig } from './ProposalConfig';
 
 export const AutoScrollController: React.FC = () => {
     const { isPlaying, togglePlay, setIsPlaying, isScrollPaused } = useAutoScroll();
+    const lenis = useLenis();
+    const { config } = useProposalConfig();
     const [speed, setSpeed] = useState(0.8); // Pixels per frame
-    const requestRef = useRef<number | null>(null);
+    const requestRef = useRef<number | null>(null); // Moved to top level
 
     const animate = () => {
-        // If external component requested pause (e.g. Book reading), we don't scroll
-        // but we stay in "Playing" state
         if (!isScrollPaused) {
-            // Check if we reached the bottom (with a small buffer)
             if (window.innerHeight + window.scrollY >= document.body.scrollHeight - 5) {
                 setIsPlaying(false);
                 return;
             }
-            window.scrollBy(0, speed);
+
+            if (lenis) {
+                // Use scrollTo with immediate flag for proper Lenis integration
+                lenis.scrollTo(lenis.scroll + speed * 2, { immediate: true });
+            } else {
+                window.scrollBy(0, speed);
+            }
         }
 
         requestRef.current = requestAnimationFrame(animate);
     };
 
     useEffect(() => {
+        if (!config.enableAutoplay) return; // Exit effect if disabled, but hook is still called
+
         if (isPlaying) {
             requestRef.current = requestAnimationFrame(animate);
         } else {
@@ -32,7 +41,7 @@ export const AutoScrollController: React.FC = () => {
         return () => {
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         };
-    }, [isPlaying, speed, isScrollPaused]);
+    }, [isPlaying, speed, isScrollPaused, lenis, config.enableAutoplay]);
 
     // Stop on manual interaction to prevent fighting the user
     useEffect(() => {
@@ -42,7 +51,7 @@ export const AutoScrollController: React.FC = () => {
 
         window.addEventListener("wheel", handleInteraction);
         window.addEventListener("touchmove", handleInteraction);
-        window.addEventListener("keydown", handleInteraction); // e.g. arrow keys
+        window.addEventListener("keydown", handleInteraction);
 
         return () => {
             window.removeEventListener("wheel", handleInteraction);
@@ -50,6 +59,8 @@ export const AutoScrollController: React.FC = () => {
             window.removeEventListener("keydown", handleInteraction);
         };
     }, [isPlaying, setIsPlaying]);
+
+    if (!config.enableAutoplay) return null;
 
     const changeSpeed = (newSpeed: number) => {
         setSpeed(newSpeed);

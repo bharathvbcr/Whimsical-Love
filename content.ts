@@ -7,7 +7,7 @@
  * All content visible in the app is sourced from here.
  */
 
-import { LucideIcon, Zap, Heart, Compass, Music, Infinity, Eye, Shield, Anchor } from 'lucide-react';
+import { LucideIcon, Zap, Heart, Compass, Music, Infinity as InfinityIcon, Eye, Shield, Anchor } from 'lucide-react';
 
 // ==========================================
 // PERSONALIZATION - START HERE! ✨
@@ -18,13 +18,13 @@ import { LucideIcon, Zap, Heart, Compass, Music, Infinity, Eye, Shield, Anchor }
  */
 export const personalization = {
     /** Your partner's name (appears throughout the experience) */
-    partnerName: "Sarah",
+    partnerName: "Honey",
 
     /** Your name (for signing messages) */
-    yourName: "James",
+    yourName: "Bharath",
 
     /** When did you meet/start dating? (used in TimeSection) */
-    relationshipStartDate: "2022-06-15",
+    relationshipStartDate: "2025-07-19",
 
     /** The big day! Leave empty to hide countdown */
     proposalDate: "",
@@ -42,12 +42,81 @@ export const personalization = {
 };
 
 /**
+ * 🛠️ FEATURES - Toggle specific experimental features
+ */
+export const features = {
+    /** Show countdown timer to proposalDate in the Hero section */
+    enableCountdown: false,
+
+    /** Enable Konami code (Up, Up, Down, Down, Left, Right, Left, Right, B, A) */
+    enableKonami: false,
+
+    /** Secret message revealed by Konami code */
+    konamiSecretMessage: "You found my secret hideout! I love you so much, more than all the stars in the sky. ❤️",
+};
+
+/**
  * 🎨 THEME - Customize your colors
- * Primary options: 'rose' | 'purple' | 'blue' | 'amber' | 'emerald'
+ * Primary options: 'rose' | 'midnight' | 'sunset' | 'forest'
  */
 export const themeConfig = {
-    primaryColor: "rose",  // Main color throughout
+    primaryColor: "rose" as 'rose' | 'midnight' | 'sunset' | 'forest',
     accentColor: "rose",   // Button and highlight color
+};
+
+export const themes = {
+    rose: {
+        '--color-rose-50': '#fff1f2',
+        '--color-rose-100': '#ffe4e6',
+        '--color-rose-200': '#fecdd3',
+        '--color-rose-300': '#fda4af',
+        '--color-rose-400': '#fb7185',
+        '--color-rose-500': '#f43f5e',
+        '--color-rose-600': '#e11d48',
+        '--color-rose-700': '#be123c',
+        '--color-rose-800': '#9f1239',
+        '--color-rose-900': '#881337',
+        '--color-rose-950': '#4c0519',
+    },
+    midnight: {
+        '--color-rose-50': '#f0f9ff',
+        '--color-rose-100': '#e0f2fe',
+        '--color-rose-200': '#bae6fd',
+        '--color-rose-300': '#7dd3fc',
+        '--color-rose-400': '#38bdf8',
+        '--color-rose-500': '#0ea5e9',
+        '--color-rose-600': '#0284c7',
+        '--color-rose-700': '#0369a1',
+        '--color-rose-800': '#075985',
+        '--color-rose-900': '#0c4a6e',
+        '--color-rose-950': '#082f49',
+    },
+    sunset: {
+        '--color-rose-50': '#fff7ed',
+        '--color-rose-100': '#ffedd5',
+        '--color-rose-200': '#fed7aa',
+        '--color-rose-300': '#fdba74',
+        '--color-rose-400': '#fb923c',
+        '--color-rose-500': '#f97316',
+        '--color-rose-600': '#ea580c',
+        '--color-rose-700': '#c2410c',
+        '--color-rose-800': '#9a3412',
+        '--color-rose-900': '#7c2d12',
+        '--color-rose-950': '#431407',
+    },
+    forest: {
+        '--color-rose-50': '#f0fdf4',
+        '--color-rose-100': '#dcfce7',
+        '--color-rose-200': '#bbf7d0',
+        '--color-rose-300': '#86efac',
+        '--color-rose-400': '#4ade80',
+        '--color-rose-500': '#22c55e',
+        '--color-rose-600': '#16a34a',
+        '--color-rose-700': '#15803d',
+        '--color-rose-800': '#166534',
+        '--color-rose-900': '#14532d',
+        '--color-rose-950': '#052e16',
+    }
 };
 
 /**
@@ -74,6 +143,7 @@ export interface JourneyMilestone {
     x: number; // Percentage position (0-100)
     y: number; // Percentage position (0-100)
     color: string; // Tailwind bg + text color classes
+    description?: string;
 }
 
 export interface StoryPage {
@@ -127,11 +197,11 @@ export interface MusicConfig {
  * Adjust x/y (0-100) to position milestones on the map.
  */
 export const journeyMilestones: JourneyMilestone[] = [
-    { icon: Zap, label: "The Spark", x: 20, y: 10, color: "bg-amber-100 text-amber-600" },
-    { icon: Infinity, label: "Inseparable", x: 80, y: 30, color: "bg-blue-100 text-blue-600" },
-    { icon: Heart, label: "The Confession", x: 30, y: 55, color: "bg-rose-100 text-rose-600" },
-    { icon: Compass, label: "First Adventure", x: 70, y: 75, color: "bg-green-100 text-green-600" },
-    { icon: Music, label: "Found Our Rhythm", x: 50, y: 95, color: "bg-purple-100 text-purple-600" },
+    { icon: Zap, label: "The Spark", x: 20, y: 10, color: "bg-amber-100 text-amber-600", description: "The moment our eyes met and the world changed forever." },
+    { icon: InfinityIcon, label: "Inseparable", x: 80, y: 30, color: "bg-blue-100 text-blue-600", description: "When 'I' and 'You' became 'Us' in every way." },
+    { icon: Heart, label: "The Confession", x: 30, y: 55, color: "bg-rose-100 text-rose-600", description: "Three words, eight letters, and a lifetime of meaning." },
+    { icon: Compass, label: "First Adventure", x: 70, y: 75, color: "bg-green-100 text-green-600", description: "Exploring the world, knowing I'd never be lost with you." },
+    { icon: Music, label: "Found Our Rhythm", x: 50, y: 95, color: "bg-purple-100 text-purple-600", description: "Dancing through life's highs and lows, perfectly in sync." },
 ];
 
 /**
@@ -173,7 +243,7 @@ export const timelineEvents: TimelineEvent[] = [
         align: 'left',
     },
     {
-        icon: Infinity,
+        icon: InfinityIcon,
         date: "Today",
         title: "Forever",
         desc: "That instant spark turned into an eternal flame. I love you more with every passing second.",
@@ -196,7 +266,7 @@ export const promises: Promise[] = [
         text: "I'm not just here for the good times. I promise to stand by you when life gets hard. I'm never leaving."
     },
     {
-        icon: Infinity,
+        icon: InfinityIcon,
         title: "Forever",
         text: "From that first glance to our last breath. My love for you isn't just for now; it's for always."
     }

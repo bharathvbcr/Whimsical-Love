@@ -8,6 +8,9 @@ interface ProposalConfig {
     // Preview mode
     previewMode: boolean;
 
+    // Feature flags
+    enableAutoplay: boolean;
+
     // Interactive states (to reset)
     resetKey: number;
 }
@@ -24,6 +27,7 @@ const defaultConfig: ProposalConfig = {
     typewriterSpeed: 50,
     scrollSpeed: 0.8,
     previewMode: false,
+    enableAutoplay: false,
     resetKey: 0,
 };
 
@@ -55,9 +59,12 @@ export const ProposalConfigProvider: React.FC<ProposalConfigProviderProps> = ({ 
         : new URLSearchParams();
     const isPreviewFromUrl = urlParams.get('preview') === 'true';
 
+    const isAutoplayFromUrl = urlParams.get('autoplay') === 'true';
+
     const [config, setConfig] = useState<ProposalConfig>({
         ...defaultConfig,
         previewMode: isPreviewFromUrl,
+        enableAutoplay: isAutoplayFromUrl,
     });
 
     const setTypewriterSpeed = useCallback((speed: number) => {

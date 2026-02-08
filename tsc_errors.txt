@@ -1,0 +1,4 @@
+components/ErrorBoundary.tsx(33,14): error TS2339: Property 'setState' does not exist on type 'ErrorBoundary'.
+components/ErrorBoundary.tsx(42,22): error TS2339: Property 'props' does not exist on type 'ErrorBoundary'.
+components/ErrorBoundary.tsx(43,29): error TS2339: Property 'props' does not exist on type 'ErrorBoundary'.
+components/ErrorBoundary.tsx(77,21): error TS2339: Property 'props' does not exist on type 'ErrorBoundary'.

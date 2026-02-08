@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { Heart, Trophy, Smile, Sparkles } from 'lucide-react';
+import { useAutoScroll } from './AutoScrollContext';
 
 const questions = [
     {
@@ -29,6 +30,56 @@ export const LoveQuiz: React.FC = () => {
     const [feedback, setFeedback] = useState<string | null>(null);
     const [shaking, setShaking] = useState(false);
 
+    // Movie Mode Integration
+    const { isPlaying, registerPause, unregisterPause } = useAutoScroll();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isInView = useInView(containerRef, { amount: 0.5 });
+    const [hasAutoAnswered, setHasAutoAnswered] = useState(false);
+
+    // Auto-answer effect for Movie Mode
+    useEffect(() => {
+        if (isPlaying && isInView && !hasAutoAnswered && !isComplete) {
+            registerPause('quiz');
+
+            let questionIndex = currentQ;
+            let autoAnswerTimeout: NodeJS.Timeout;
+
+            const autoAnswer = () => {
+                if (questionIndex >= questions.length) {
+                    setHasAutoAnswered(true);
+                    setTimeout(() => unregisterPause('quiz'), 2000);
+                    return;
+                }
+
+                const question = questions[questionIndex];
+                const correctOption = question.options.find(opt => opt.correct);
+                if (correctOption) {
+                    setFeedback(correctOption.message);
+                    autoAnswerTimeout = setTimeout(() => {
+                        setFeedback(null);
+                        questionIndex++;
+                        if (questionIndex < questions.length) {
+                            setCurrentQ(questionIndex);
+                            autoAnswerTimeout = setTimeout(autoAnswer, 2000);
+                        } else {
+                            setIsComplete(true);
+                            setHasAutoAnswered(true);
+                            setTimeout(() => unregisterPause('quiz'), 3000);
+                        }
+                    }, 1500);
+                }
+            };
+
+            const startDelay = setTimeout(autoAnswer, 1500);
+
+            return () => {
+                clearTimeout(startDelay);
+                if (autoAnswerTimeout) clearTimeout(autoAnswerTimeout);
+                unregisterPause('quiz');
+            };
+        }
+    }, [isPlaying, isInView, hasAutoAnswered, isComplete, currentQ, registerPause, unregisterPause]);
+
     const handleAnswer = (correct: boolean, message: string) => {
         setFeedback(message);
         if (correct) {
@@ -47,7 +98,7 @@ export const LoveQuiz: React.FC = () => {
     };
 
     return (
-        <section className="py-24 bg-gradient-to-br from-purple-50 to-rose-50 flex items-center justify-center relative overflow-hidden">
+        <section ref={containerRef} className="py-24 bg-gradient-to-br from-purple-50 to-rose-50 flex items-center justify-center relative overflow-hidden">
             {/* Background Decorations */}
             <div className="absolute top-10 left-10 w-32 h-32 bg-purple-200 rounded-full blur-3xl opacity-50 animate-pulse"></div>
             <div className="absolute bottom-10 right-10 w-40 h-40 bg-rose-200 rounded-full blur-3xl opacity-50 animate-pulse delay-700"></div>
@@ -72,7 +123,7 @@ export const LoveQuiz: React.FC = () => {
                                 <div className="mb-6 inline-block p-4 bg-rose-100 rounded-full text-rose-500">
                                     {React.createElement(questions[currentQ].icon, { size: 32 })}
                                 </div>
-                                
+
                                 <h3 className="font-hand text-3xl text-slate-800 mb-8 font-bold">
                                     {questions[currentQ].text}
                                 </h3>
@@ -86,11 +137,11 @@ export const LoveQuiz: React.FC = () => {
                                             whileHover={{ scale: 1.02 }}
                                             whileTap={{ scale: 0.98 }}
                                             className={`p-4 rounded-xl text-xl font-sans font-semibold border-2 transition-all
-                                                ${feedback && opt.correct 
-                                                    ? "bg-green-100 border-green-300 text-green-700" 
+                                                ${feedback && opt.correct
+                                                    ? "bg-green-100 border-green-300 text-green-700"
                                                     : feedback && !opt.correct
-                                                    ? "bg-red-50 border-red-200 text-red-400"
-                                                    : "bg-white border-slate-100 hover:border-rose-200 hover:shadow-lg text-slate-600"
+                                                        ? "bg-red-50 border-red-200 text-red-400"
+                                                        : "bg-white border-slate-100 hover:border-rose-200 hover:shadow-lg text-slate-600"
                                                 }
                                             `}
                                         >
@@ -100,7 +151,7 @@ export const LoveQuiz: React.FC = () => {
                                 </div>
 
                                 {feedback && (
-                                    <motion.div 
+                                    <motion.div
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         className="mt-6 text-rose-500 font-bold font-hand text-xl"
@@ -116,7 +167,7 @@ export const LoveQuiz: React.FC = () => {
                                 animate={{ scale: 1, opacity: 1 }}
                                 className="text-center"
                             >
-                                <motion.div 
+                                <motion.div
                                     className="inline-block relative mb-6"
                                     animate={{ rotate: [0, 10, -10, 0] }}
                                     transition={{ repeat: Infinity, duration: 2, repeatDelay: 1 }}
@@ -141,8 +192,8 @@ export const LoveQuiz: React.FC = () => {
                     {!isComplete && (
                         <div className="absolute bottom-8 flex gap-2">
                             {questions.map((_, i) => (
-                                <div 
-                                    key={i} 
+                                <div
+                                    key={i}
                                     className={`w-2 h-2 rounded-full transition-colors duration-300 ${i === currentQ ? 'bg-rose-500' : 'bg-slate-200'}`}
                                 />
                             ))}

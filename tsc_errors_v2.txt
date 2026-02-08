@@ -1,0 +1,11 @@
+components/AudioManager.tsx(11,13): error TS2339: Property 'musicConfig' does not exist on type 'ContentContextType'.
+components/Hero.tsx(8,11): error TS2339: Property 'personalization' does not exist on type 'ContentContextType'.
+components/JourneyMap.tsx(7,13): error TS2339: Property 'journeyMilestones' does not exist on type 'ContentContextType'.
+components/MemoryTimeline.tsx(55,13): error TS2339: Property 'timelineEvents' does not exist on type 'ContentContextType'.
+components/MusicPlayer.tsx(8,11): error TS2339: Property 'musicConfig' does not exist on type 'ContentContextType'.
+components/PhotoGallery.tsx(11,13): error TS2339: Property 'photoMemories' does not exist on type 'ContentContextType'.
+components/PromiseSection.tsx(6,13): error TS2339: Property 'promises' does not exist on type 'ContentContextType'.
+components/ProposalFooter.tsx(11,13): error TS2339: Property 'personalization' does not exist on type 'ContentContextType'.
+components/QualitiesSection.tsx(17,11): error TS2339: Property 'qualities' does not exist on type 'ContentContextType'.
+components/StickyNotes.tsx(65,11): error TS2339: Property 'stickyNotes' does not exist on type 'ContentContextType'.
+components/StoryBook.tsx(307,13): error TS2339: Property 'storyPages' does not exist on type 'ContentContextType'.

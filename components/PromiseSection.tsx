@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../hooks/useContent';
 
 export const PromiseSection: React.FC = () => {
     const { promises } = useContent();

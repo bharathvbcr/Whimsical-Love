@@ -5,9 +5,10 @@
 
 **A beautiful, animated proposal website to ask your special someone the most important question.**
 
-[![Live Demo](https://img.shields.io/badge/Demo-Live%20Preview-ff6b9d?style=for-the-badge)](https://your-demo-link.vercel.app)
+[![Live Demo](https://img.shields.io/badge/Demo-Live%20Preview-ff6b9d?style=for-the-badge)](https://whimsical-love.vercel.app)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](./LICENSE)
-[![Made with Love](https://img.shields.io/badge/Made%20with-❤️-red?style=for-the-badge)](https://github.com/yourusername)
+[![Made with Love](https://img.shields.io/badge/Made%20with-❤️-red?style=for-the-badge)](https://github.com/bharathvbcr)
+[![Animations](https://img.shields.io/badge/Animations-60FPS%20Smooth-8b5cf6?style=for-the-badge)](https://www.framer.com/motion/)
 
 </div>
 
@@ -15,14 +16,35 @@
 
 ## ✨ Features
 
-- 🎬 **Cinematic Experience** - Auto-scroll, background music, and smooth transitions
-- 📖 **Interactive Storybook** - Tell your love story page by page
+- 🎬 **Cinematic Experience** - Autoplay Magic with cinematic auto-scroll powered by **Lenis** for buttery-smooth inertia scrolling.
+- 📱 **Installable App (PWA)** - Works offline! Install it to your home screen for the perfect proposal anywhere.
+- 📖 **Interactive Storybook** - Tell your love story page by page with smooth animations
+- 🗺️ **Journey Map** - Visualize the winding path of your relationship with custom milestones
+- 🎮 **Mini-Games & Interactivity** - Love Quiz, Date Night Spinner, and Scratch Card
+- 🌿 **Digital Garden** - A growing section of your shared qualities and memories
 - 💍 **Ring Box Animation** - A stunning 3D ring reveal before the big question
-- 🖼️ **Photo Gallery** - Showcase your memories together
-- 🎮 **Interactive Elements** - Quiz, scratch card, date night spinner
-- 🚫 **Playful "No" Button** - It runs away when hovered!
-- 🎊 **Celebration Mode** - Confetti explosion when she says YES!
-- 🔧 **Fully Customizable** - Just edit one file to personalize everything
+- 🖼️ **Photo Gallery** - Showcase your memories in a beautiful, responsive grid
+- 🚫 **Playful "No" Button** - It struggles and runs away when hovered!
+- ⌨️ **Konami Code Surprise** - Try `↑ ↑ ↓ ↓ ← → ← → b a` for a special treat!
+- 🎊 **Celebration Mode** - Confetti explosion and special message when she says YES!
+- 🎨 **Dynamic Themes** - Easily switch between color themes (rose, midnight, sunset, forest)
+- 🧙 **Setup Wizard** - Create your proposal in minutes with `npm run setup`
+- 🔧 **Fully Customizable** - Edit one single file to personalize the entire experience
+
+---
+
+## 📸 Visual Preview
+
+> *Animations so smooth, they'll skip a beat.*
+
+<div align="center">
+  <!-- 
+    TODO: Add a screen recording of your proposal here! 
+    Recommended: Use Screen Studio or OBS to record a high-quality GIF/MP4.
+  -->
+  <img src="public/photos/preview-placeholder.jpg" alt="Preview of Smooth Animations" width="100%" style="border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.1);" />
+  <p><em>(Add your own demo GIF here to showcase the 60FPS animations)</em></p>
+</div>
 
 ---
 
@@ -31,67 +53,79 @@
 ### Prerequisites
 
 - [Node.js](https://nodejs.org/) (v18 or higher)
+- [npm](https://www.npmjs.com/) (usually comes with Node.js)
 
 ### Installation
 
-```bash
-# Clone the repository
-git clone https://github.com/yourusername/whimsical-proposal.git
-cd whimsical-proposal
+1.  **Clone the repository:**
 
-# Install dependencies
-npm install
+    ```bash
+    git clone https://github.com/bharathvbcr/Whimsical-Love.git
+    cd Whimsical-Love
+    ```
 
-# Start the development server
-npm run dev
-```
+2.  **Install dependencies:**
 
-Open [http://localhost:5173](http://localhost:5173) to see your proposal!
+    ```bash
+    npm install
+    ```
+
+3.  **Run the Setup Wizard:**
+    This interactive tool will help you customize names, dates, and themes quickly.
+
+    ```bash
+    npm run setup
+    ```
+
+4.  **Start the development server:**
+
+    ```bash
+    npm run dev
+    ```
+
+    Open [http://localhost:5173](http://localhost:5173) in your browser to verify the setup.
 
 ---
 
-## 🎨 Personalization
+## 🎨 Customization
 
-The magic is in `content.ts` - **one file to customize everything!**
+You have two main ways to personalize the experience:
 
-### 1. Add Your Names
+### Option A: The Setup Wizard (Recommended)
 
-```typescript
-export const personalization = {
-    partnerName: "Her Name",  // Appears throughout
-    yourName: "Your Name",    // Signs the final message
-    relationshipStartDate: "2022-06-15",
-    specialMessage: "Your heartfelt message here..."
-};
-```
+Run `npm run setup` in your terminal. This wizard guides you through setting:
+- Partner's Name & Your Name
+- Key Dates (Start of relationship, Proposal date)
+- Color Theme
+- Song Selection
 
-### 2. Add Your Photos
+It generates a `proposal.config.json` file in the `public/` directory.
 
-Place photos in `/public/photos/` and update:
+### Option B: Advanced Customization (`content.ts`)
 
-```typescript
-export const photoMemories = [
-    { src: "/photos/first-date.jpg", caption: "Our first date", date: "June 2022" },
-    { src: "/photos/vacation.jpg", caption: "That amazing trip", date: "Summer 2023" },
-];
-```
+For deeper customization (adding photos, specific milestones, quiz questions), edit `content.ts`. This file serves as the central configuration for the app content.
 
-### 3. Customize Your Story
+**Key areas to customize:**
 
-Edit the `storyPages`, `timelineEvents`, `promises`, `stickyNotes`, and more in `content.ts`.
+1.  **Personal Details**: Update `personalization` object.
+2.  **Theme**: Change `themeConfig`.
+3.  **Photos**: Add images to `public/photos/` and update `photoMemories`.
+4.  **Story**: Edit `journeyMilestones`, `storyPages`, `stickyNotes`, etc.
+5.  **Music**: Place your song in `public/music/` and update `musicConfig`.
 
-### 4. Add Your Song
+Refer to [CUSTOMIZATION.md](./CUSTOMIZATION.md) for a comprehensive guide.
 
-Replace the music URL with your special song:
+---
 
-```typescript
-export const musicConfig = {
-    url: "/music/our-song.mp3",  // Place in /public/music/
-    label: "Our Song"
-};
-```
+## 🔥 Firebase Setup (Optional)
 
-See [CUSTOMIZATION.md](./CUSTOMIZATION.md) for the complete guide.
+To enable features like shareable links and usage analytics, configure Firebase:
+
+1.  Create a project in the [Firebase Console](https://console.firebase.google.com/).
+2.  Register a Web App and copy the configuration.
+3.  Update `lib/firebase.ts` with your config keys.
+
+    > **Security Note:** Ideally, use environment variables (`.env`) for these keys in a production environment to keep them secure.
 
 ---
 
@@ -99,18 +133,21 @@ See [CUSTOMIZATION.md](./CUSTOMIZATION.md) for the complete guide.
 
 ### Deploy to Vercel (Recommended)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/whimsical-proposal)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/bharathvbcr/Whimsical-Love)
 
 ### Deploy to Netlify
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/yourusername/whimsical-proposal)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/bharathvbcr/Whimsical-Love)
 
 ### Manual Build
 
+To build the project for static hosting:
+
 ```bash
 npm run build
-# Output is in /dist - upload to any static hosting
 ```
+
+The output will be in the `dist/` directory, ready to be uploaded to any static hosting service.
 
 ---
 
@@ -118,28 +155,31 @@ npm run build
 
 ```
 whimsical-proposal/
-├── public/
-│   └── photos/          # Your photos go here
-├── components/
-│   ├── Hero.tsx         # Opening section
-│   ├── StoryBook.tsx    # Interactive fairy tale
-│   ├── PhotoGallery.tsx # Your memories
-│   ├── RingBox.tsx      # Ring reveal animation
-│   └── ProposalFooter.tsx # The big question!
-├── content.ts           # ⭐ YOUR CONTENT HERE
-├── App.tsx              # Main application
-└── index.html           # Entry point
+├── public/              # Static assets (photos, music, logo)
+├── components/          # Reusable UI components
+│   ├── Hero.tsx         # Opening cinematic section
+│   ├── StoryBook.tsx    # Interactive fairy tale book
+│   ├── JourneyMap.tsx   # Interactive relationship path
+│   ├── LoveQuiz.tsx     # Playful relationship quiz
+│   ├── RingBox.tsx      # 3D Ring reveal animation
+│   └── ProposalFooter.tsx # The big question & celebration
+├── content.ts           # ⭐ YOUR CONTENT CONFIGURATION
+├── App.tsx              # Main application logic
+├── index.tsx            # React entry point
+└── tailwind.config.js   # Style configuration
 ```
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **React 19** - UI Framework
-- **Framer Motion** - Animations
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **Tailwind-style CSS** - Styling
+- **React 19** - Modern UI Library
+- **Framer Motion** - Production-ready animation library for React
+- **Lenis** - High-performance smooth scrolling for that "cinematic" feel
+- **Lucide React** - Beautiful, consistent iconography
+- **Firebase** - Optional backend for sharing/analytics
+- **Vite** - Lightning-fast build tool
+- **Tailwind CSS** - Modern styling utility
 
 ---
 
@@ -154,17 +194,22 @@ whimsical-proposal/
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to:
+We welcome contributions! If you have ideas for new animations, features, or themes:
 
-- Report bugs
-- Suggest new features
-- Submit pull requests
+1.  **Fork** the repository.
+2.  **Clone** your fork locally.
+3.  **Create a new branch** (`git checkout -b feature/AmazingFeature`).
+4.  **Commit** your changes (`git commit -m 'Add some AmazingFeature'`).
+5.  **Push** to the branch (`git push origin feature/AmazingFeature`).
+6.  **Open a Pull Request**.
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for more detailed guidelines.
 
 ---
 
 ## 📄 License
 
-MIT License - feel free to use this for your own proposal! See [LICENSE](./LICENSE) for details.
+Distributed under the MIT License. See [LICENSE](./LICENSE) for more information.
 
 ---
 

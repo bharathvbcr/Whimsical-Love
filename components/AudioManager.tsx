@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useExperience } from './AutoScrollContext';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../hooks/useContent';
 
 /**
  * AudioManager - Invisible component that manages the hidden audio element
@@ -8,7 +8,7 @@ import { useContent } from '../contexts/ContentContext';
  */
 export const AudioManager: React.FC = () => {
     const { audioRef } = useExperience();
-    const { music } = useContent();
+    const { musicConfig } = useContent();
 
     // This component renders a hidden audio element and links it to the context
     return (
@@ -16,7 +16,7 @@ export const AudioManager: React.FC = () => {
             ref={audioRef}
             loop
             preload="auto"
-            src={music.url}
+            src={musicConfig.url}
             className="hidden"
         />
     );

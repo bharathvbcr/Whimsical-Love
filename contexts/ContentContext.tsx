@@ -8,21 +8,16 @@ import { analytics } from '../lib/firebase';
 // Type inference from the default content
 type ContentType = typeof defaultContent;
 
-interface ContentContextType {
-    content: ContentType;
+interface ContentState {
     isLoading: boolean;
     isCustom: boolean;
+    content: ContentType;
 }
 
-const ContentContext = createContext<ContentContextType | null>(null);
+// The context type includes all exports from content.ts plus the state fields
+export type ContentContextType = ContentType & ContentState;
 
-export const useContent = () => {
-    const context = useContext(ContentContext);
-    if (!context) {
-        throw new Error('useContent must be used within a ContentProvider');
-    }
-    return context;
-};
+export const ContentContext = createContext<ContentContextType | null>(null);
 
 interface ContentProviderProps {
     children: ReactNode;
@@ -46,21 +41,10 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
 
                     if (docSnap.exists()) {
                         const data = docSnap.data();
-                        // Deep merge specific sections if needed, or replace entire sections
-                        // For now we'll assume the data structure matches content.ts exports
-                        // We might need to map fields if they are stored differently
-
-                        // NOTE: This implementation assumes the stored data matches the structure 
-                        // of the exports in content.ts. You might need parsers here.
-
-                        // Since content.ts exports multiple named exports, we need to handle them.
-                        // Ideally, we store them as a single JSON object in Firestore.
-
-                        // Merging strategy:
                         const mergedContent = { ...defaultContent };
 
                         if (data.personalization) mergedContent.personalization = { ...mergedContent.personalization, ...data.personalization };
-                        if (data.storyPages) mergedContent.storyPages = data.storyPages; // Arrays are usually replaced
+                        if (data.storyPages) mergedContent.storyPages = data.storyPages;
                         if (data.timelineEvents) mergedContent.timelineEvents = data.timelineEvents;
                         if (data.promises) mergedContent.promises = data.promises;
                         if (data.stickyNotes) mergedContent.stickyNotes = data.stickyNotes;
@@ -89,6 +73,25 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
                     }
                 }
             } else {
+                // Try fetching local config from public/proposal.config.json
+                try {
+                    const response = await fetch('/proposal.config.json');
+                    if (response.ok) {
+                        const localData = await response.json();
+                        const mergedLocalContent = { ...defaultContent };
+
+                        if (localData.personalization) mergedLocalContent.personalization = { ...mergedLocalContent.personalization, ...localData.personalization };
+                        if (localData.themeConfig) mergedLocalContent.themeConfig = { ...mergedLocalContent.themeConfig, ...localData.themeConfig };
+                        if (localData.musicConfig) mergedLocalContent.musicConfig = { ...mergedLocalContent.musicConfig, ...localData.musicConfig };
+
+                        setContent(mergedLocalContent);
+                        setIsCustom(true);
+                        console.log('Loaded local configuration');
+                    }
+                } catch (e) {
+                    console.log('No local config found or failed to load');
+                }
+
                 if (analytics) {
                     logEvent(analytics, 'view_default_proposal', { reason: 'no_id' });
                 }
@@ -99,11 +102,32 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
         loadContent();
     }, []);
 
+    // Apply theme CSS variables whenever themeConfig changes
+    useEffect(() => {
+        const primaryColor = content.themeConfig.primaryColor as keyof typeof defaultContent.themes;
+        const themeVars = defaultContent.themes[primaryColor] || defaultContent.themes.rose;
+
+        const root = document.documentElement;
+        Object.entries(themeVars).forEach(([key, value]) => {
+            root.style.setProperty(key, value);
+        });
+    }, [content.themeConfig.primaryColor]);
+
     // Create a wrapper object that matches the export structure of content.ts
     // so consuming components can destructure it easily: const { personalization } = useContent();
     const value = {
-        ...content, // Spread the content object so properties are top-level
-        content,    // Also provide the full object if needed
+        personalization: content.personalization,
+        features: content.features || defaultContent.features, // Ensure fallback
+        themeConfig: content.themeConfig,
+        photoMemories: content.photoMemories,
+        journeyMilestones: content.journeyMilestones,
+        storyPages: content.storyPages,
+        timelineEvents: content.timelineEvents,
+        promises: content.promises,
+        stickyNotes: content.stickyNotes,
+        qualities: content.qualities,
+        musicConfig: content.musicConfig,
+        content,
         isLoading,
         isCustom
     };

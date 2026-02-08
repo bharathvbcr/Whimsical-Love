@@ -3,7 +3,7 @@ import { StoryCard } from './StoryCard';
 import { HighlightCard } from './HighlightCard';
 import { Star, Smile, HeartHandshake, Sparkles, Sun, LucideIcon } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../hooks/useContent';
 
 // Map icon names to actual icon components
 const iconMap: Record<string, LucideIcon> = {

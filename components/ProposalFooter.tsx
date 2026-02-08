@@ -1,11 +1,81 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useInView } from 'framer-motion';
 import { Heart, Sparkles } from 'lucide-react';
 import { Envelope } from './Envelope';
 import { TypewriterText } from './TypewriterText';
 import { RingBox } from './RingBox';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../hooks/useContent';
 import confetti from 'canvas-confetti';
+import { haptic } from 'ios-haptics';
+import { useAutoScroll } from './AutoScrollContext';
+
+// Extracted Pure Components for Animation
+const FloatingHeart: React.FC = () => {
+    const [anim, setAnim] = useState<any>(null);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setAnim({
+                yInitial: "100vh",
+                xInitial: Math.random() * 100 + "vw",
+                scaleInitial: Math.random() * 0.5 + 0.5,
+                duration: Math.random() * 10 + 10,
+                delay: Math.random() * 5,
+                size: Math.random() * 50 + 20
+            });
+        }, 0);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (!anim) return null;
+
+    return (
+        <motion.div
+            className="absolute text-rose-500/20"
+            initial={{ y: anim.yInitial, x: anim.xInitial, scale: anim.scaleInitial }}
+            animate={{ y: "-10vh" }}
+            transition={{ duration: anim.duration, repeat: Infinity, delay: anim.delay }}
+        >
+            <Heart size={anim.size} fill="currentColor" />
+        </motion.div>
+    );
+};
+
+const TextSparkle: React.FC<{ index: number }> = ({ index }) => {
+    const [size, setSize] = useState(0);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setSize(24 + Math.random() * 20);
+        }, 0);
+        return () => clearTimeout(timer);
+    }, []);
+
+    if (size === 0) return null;
+
+    return (
+        <motion.div
+            className="absolute text-yellow-200"
+            initial={{ scale: 0, opacity: 0 }}
+            animate={{
+                scale: [0, 1, 0],
+                opacity: [0, 1, 0],
+                rotate: [0, 180],
+                x: Math.cos(index * 60 * (Math.PI / 180)) * 200,
+                y: Math.sin(index * 60 * (Math.PI / 180)) * 100
+            }}
+            transition={{ duration: 2.5, delay: 1 + index * 0.2, repeat: Infinity, repeatDelay: 1 }}
+            style={{
+                left: "50%",
+                top: "50%",
+                marginLeft: -12,
+                marginTop: -12
+            }}
+        >
+            <Sparkles size={size} />
+        </motion.div>
+    );
+};
 
 export const ProposalFooter: React.FC = () => {
     const { personalization } = useContent();
@@ -15,6 +85,62 @@ export const ProposalFooter: React.FC = () => {
     const [isRingBoxOpen, setIsRingBoxOpen] = useState(false);
     const [showProposal, setShowProposal] = useState(false);
     const [showWhiteOverlay, setShowWhiteOverlay] = useState(false);
+
+    // Heartbeat interval ref for cleanup
+    const heartbeatInterval = useRef<ReturnType<typeof setInterval> | null>(null);
+
+    // Cleanup heartbeat interval on unmount
+    useEffect(() => {
+        return () => {
+            if (heartbeatInterval.current) clearInterval(heartbeatInterval.current);
+        };
+    }, []);
+    // Mobile detection
+    const [isTouchDevice, setIsTouchDevice] = useState(false);
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            const checkTouch = () => 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            setIsTouchDevice(checkTouch());
+        }, 0);
+        return () => clearTimeout(timer);
+    }, []);
+
+    // Movie Mode Integration
+    const { isPlaying, registerPause, unregisterPause } = useAutoScroll();
+    const containerRef = useRef<HTMLDivElement>(null);
+    const isInView = useInView(containerRef, { amount: 0.4 });
+    const [hasAutoRevealed, setHasAutoRevealed] = useState(false);
+
+    // Auto-reveal effect for Movie Mode
+    useEffect(() => {
+        if (isPlaying && isInView && !hasAutoRevealed && !isEnvelopeOpen) {
+            registerPause('proposal');
+
+            const revealSequence = setTimeout(() => {
+                // Open the envelope
+                setIsEnvelopeOpen(true);
+
+                // Open the ring box shortly after
+                setTimeout(() => {
+                    setIsRingBoxOpen(true);
+
+                    // Show the proposal question
+                    setTimeout(() => {
+                        setShowProposal(true);
+                        setHasAutoRevealed(true);
+                        // Keep paused so user can appreciate the moment and click Yes manually
+                        // The experience ends here waiting for user action
+                        setTimeout(() => unregisterPause('proposal'), 2000);
+                    }, 2000);
+                }, 800);
+            }, 2000);
+
+            return () => {
+                clearTimeout(revealSequence);
+                unregisterPause('proposal');
+            };
+        }
+    }, [isPlaying, isInView, hasAutoRevealed, isEnvelopeOpen, registerPause, unregisterPause]);
 
     // Refs for "No Way" button animation
     const noBtnRef = useRef<HTMLDivElement>(null);
@@ -45,10 +171,13 @@ export const ProposalFooter: React.FC = () => {
 
     const handleMouseMove = (e: React.MouseEvent) => {
         if (!hasSaidYes) return;
-        const { clientX, clientY, currentTarget } = e;
-        const { width, height, left, top } = currentTarget.getBoundingClientRect();
-        mouseX.set((clientX - left) / width - 0.5);
-        mouseY.set((clientY - top) / height - 0.5);
+        const { clientX, clientY } = e;
+        // Since the celebration overlay is fixed inset-0, we can use window dimensions
+        // This avoids getBoundingClientRect() which causes layout thrashing
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+        mouseX.set(clientX / width - 0.5);
+        mouseY.set(clientY / height - 0.5);
     };
 
     // Calculate the origin position of the "No Way" button on first render
@@ -61,6 +190,42 @@ export const ProposalFooter: React.FC = () => {
             };
         }
     }, []);
+
+    // Clamp button position so it never leaves the viewport
+    const clampToViewport = useCallback((offsetX: number, offsetY: number): { x: number; y: number } => {
+        if (!noBtnOriginRef.current) return { x: offsetX, y: offsetY };
+
+        const origin = noBtnOriginRef.current;
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        // Button approximate half-dimensions for center-based positioning
+        const btnHalfW = 70;
+        const btnHalfH = 28;
+        const pad = 12;
+
+        // Where the button center would end up in absolute screen coords
+        const absX = origin.x + offsetX;
+        const absY = origin.y + offsetY;
+
+        // Clamp so the full button rect stays on-screen
+        const clampedX = Math.max(btnHalfW + pad, Math.min(vw - btnHalfW - pad, absX));
+        const clampedY = Math.max(btnHalfH + pad, Math.min(vh - btnHalfH - pad, absY));
+
+        return { x: clampedX - origin.x, y: clampedY - origin.y };
+    }, []);
+
+    // Reset origin on resize so boundary math stays accurate
+    useEffect(() => {
+        const handleResize = () => {
+            noBtnOriginRef.current = null;
+            noBtnX.set(0);
+            noBtnY.set(0);
+            noBtnRotate.set(0);
+        };
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [noBtnX, noBtnY, noBtnRotate]);
 
     // Enhanced evasion with smooth struggle effect
     const handleNoBtnMouseMove = useCallback((e: React.MouseEvent) => {
@@ -97,63 +262,110 @@ export const ProposalFooter: React.FC = () => {
 
             // Smoothly blend with last escape angle to prevent jitter
             const angleDiff = escapeAngle - lastEscapeAngle.current;
-            // Normalize angle difference to [-PI, PI]
             const normalizedDiff = Math.atan2(Math.sin(angleDiff), Math.cos(angleDiff));
             escapeAngle = lastEscapeAngle.current + normalizedDiff * 0.3;
             lastEscapeAngle.current = escapeAngle;
 
-            // Increased movement range - the closer the mouse, the further it escapes
+            // Movement range scaled to viewport
             const viewportWidth = window.innerWidth;
             const viewportHeight = window.innerHeight;
             const safeMargin = 60;
-            const maxRangeX = Math.min(viewportWidth / 2 - safeMargin, 500); // Increased from 400
-            const maxRangeY = Math.min(viewportHeight / 3, 350); // Increased from 250
+            const maxRangeX = Math.min(viewportWidth / 2 - safeMargin, 500);
+            const maxRangeY = Math.min(viewportHeight / 3, 350);
 
             // Escape distance is proportional to how close the mouse is
             const urgency = 1 - (distance / triggerRadius);
-            const escapeMultiplier = 0.6 + urgency * 0.6; // 60% to 120% of max range
+            const escapeMultiplier = 0.6 + urgency * 0.6;
 
             let targetX = Math.cos(escapeAngle) * maxRangeX * escapeMultiplier;
             let targetY = Math.sin(escapeAngle) * maxRangeY * escapeMultiplier;
 
-            // Clamp to safe boundaries
-            targetX = Math.max(-maxRangeX, Math.min(maxRangeX, targetX));
-            targetY = Math.max(-maxRangeY, Math.min(maxRangeY, targetY));
+            // Bounce logic: if target exceeds range, reflect it back
+            if (Math.abs(targetX) > maxRangeX) {
+                const sign = Math.sign(targetX);
+                const excess = Math.abs(targetX) - maxRangeX;
+                targetX = sign * (maxRangeX - excess);
+                noBtnRotate.set(noBtnRotate.get() + (Math.random() > 0.5 ? 10 : -10));
+            }
 
-            // Apply the new position - spring physics will handle smooth transition
-            noBtnX.set(targetX);
-            noBtnY.set(targetY);
+            if (Math.abs(targetY) > maxRangeY) {
+                const sign = Math.sign(targetY);
+                const excess = Math.abs(targetY) - maxRangeY;
+                targetY = sign * (maxRangeY - excess);
+            }
+
+            // Clamp to viewport so the button never goes off-screen
+            const clamped = clampToViewport(targetX, targetY);
+
+            noBtnX.set(clamped.x);
+            noBtnY.set(clamped.y);
 
             // Add rotation based on movement direction for extra personality
             const rotationAmount = Math.sin(wobbleSpeed * 1.5) * 15 * urgency;
             noBtnRotate.set(rotationAmount);
         }
-    }, [captureNoBtnOrigin, springNoBtnX, springNoBtnY, noBtnX, noBtnY, noBtnRotate]);
+    }, [captureNoBtnOrigin, springNoBtnX, springNoBtnY, noBtnX, noBtnY, noBtnRotate, clampToViewport]);
+
+    // Touch-specific evasion (shaking or dodging when tapped)
+    const handleNoBtnTouch = () => {
+        if (!isTouchDevice) return;
+
+        // Ensure origin is captured for boundary math
+        captureNoBtnOrigin();
+
+        const angle = Math.random() * Math.PI * 2;
+        const dist = 150 + Math.random() * 100;
+
+        const rawX = Math.cos(angle) * dist;
+        const rawY = Math.sin(angle) * dist;
+
+        // Clamp so the button stays on-screen
+        const clamped = clampToViewport(rawX, rawY);
+        noBtnX.set(clamped.x);
+        noBtnY.set(clamped.y);
+        noBtnRotate.set(Math.random() * 40 - 20);
+
+        // Short haptic buzz for "denial" — works on iOS + Android
+        haptic();
+    };
 
     const triggerConfetti = () => {
-        const duration = 5000;
-        const end = Date.now() + duration;
+        const duration = 15 * 1000;
+        const animationEnd = Date.now() + duration;
+        const defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
 
-        (function frame() {
-            confetti({
-                particleCount: 8,
-                angle: 60,
-                spread: 55,
-                origin: { x: 0 },
-                colors: ['#fb7185', '#f43f5e', '#fff']
-            });
-            confetti({
-                particleCount: 8,
-                angle: 120,
-                spread: 55,
-                origin: { x: 1 },
-                colors: ['#fb7185', '#f43f5e', '#fff']
-            });
+        const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
 
-            if (Date.now() < end) {
-                requestAnimationFrame(frame);
+        const interval: ReturnType<typeof setInterval> = setInterval(function () {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
             }
-        })();
+
+            const particleCount = 50 * (timeLeft / duration);
+            // since particles fall down, start a bit higher than random
+            confetti({
+                ...defaults,
+                particleCount,
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                colors: ['#fb7185', '#f43f5e', '#ffffff', '#ffd700']
+            });
+            confetti({
+                ...defaults,
+                particleCount,
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                colors: ['#fb7185', '#f43f5e', '#ffffff', '#ffd700']
+            });
+        }, 250);
+
+        // One big initial burst
+        confetti({
+            particleCount: 150,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ['#fb7185', '#f43f5e', '#ffffff']
+        });
     };
 
     const handleYesClick = () => {
@@ -172,8 +384,27 @@ export const ProposalFooter: React.FC = () => {
         }, 1000); // 1s fade in duration matches the animation duration below
     };
 
+    const vibrateHeartbeat = () => {
+        // Heartbeat: haptic.confirm() gives two rapid taps (thump-thump)
+        // Works on iOS (Taptic Engine via checkbox switch trick) and Android (Vibration API)
+        haptic.confirm();
+
+        // Clear any existing interval
+        if (heartbeatInterval.current) clearInterval(heartbeatInterval.current);
+
+        // Repeat every 1.2s for a relaxed but excited rhythm
+        heartbeatInterval.current = setInterval(() => {
+            haptic.confirm();
+        }, 1200);
+
+        // Stop after 15 seconds (matching confetti duration)
+        setTimeout(() => {
+            if (heartbeatInterval.current) clearInterval(heartbeatInterval.current);
+        }, 15000);
+    };
+
     return (
-        <footer className="min-h-screen relative flex flex-col items-center justify-center bg-rose-900 text-white overflow-hidden pb-20 pt-20">
+        <footer ref={containerRef} className="min-h-screen relative flex flex-col items-center justify-center bg-rose-900 text-white overflow-hidden pb-20 pt-20">
             {/* Background patterns */}
             <div className="absolute inset-0 opacity-10"
                 style={{ backgroundImage: 'radial-gradient(circle, #fff 1px, transparent 1px)', backgroundSize: '30px 30px' }}>
@@ -300,11 +531,14 @@ export const ProposalFooter: React.FC = () => {
 
                                 <div
                                     className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-16 relative"
-                                    onMouseMove={handleNoBtnMouseMove}
+                                    onMouseMove={!isTouchDevice ? handleNoBtnMouseMove : undefined}
                                 >
                                     {/* YES BUTTON */}
                                     <motion.button
-                                        onClick={handleYesClick}
+                                        onClick={() => {
+                                            handleYesClick();
+                                            vibrateHeartbeat();
+                                        }}
                                         whileHover={{
                                             scale: 1.15,
                                             y: -5,
@@ -312,8 +546,8 @@ export const ProposalFooter: React.FC = () => {
                                             textShadow: "0 0 8px rgba(255,255,255,0.8)"
                                         }}
                                         whileTap={{ scale: 0.95, y: 0 }}
-                                        initial={{ y: 20, opacity: 0 }}
-                                        animate={{ y: 0, opacity: 1 }}
+                                        initial={{ y: 20, opacity: 0, textShadow: "0px 0px 0px rgba(0,0,0,0)" }}
+                                        animate={{ y: 0, opacity: 1, textShadow: "0px 0px 0px rgba(0,0,0,0)" }}
                                         transition={{ delay: 0.5, type: "spring", stiffness: 200 }}
                                         className="bg-white text-rose-600 px-16 py-6 rounded-full font-bold text-2xl shadow-[0_0_40px_rgba(255,255,255,0.5)] transition-all flex items-center gap-3 ring-4 ring-rose-300 ring-opacity-50 z-20"
                                     >
@@ -334,13 +568,16 @@ export const ProposalFooter: React.FC = () => {
                                         className="relative z-10"
                                     >
                                         {/* Extended proximity trigger for continuous tracking */}
-                                        <div
-                                            className="absolute -inset-40 rounded-full cursor-not-allowed"
-                                            onMouseMove={handleNoBtnMouseMove}
-                                        ></div>
+                                        {!isTouchDevice && (
+                                            <div
+                                                className="absolute -inset-40 rounded-full cursor-not-allowed"
+                                                onMouseMove={handleNoBtnMouseMove}
+                                            ></div>
+                                        )}
 
                                         <button
-                                            className="bg-rose-950/50 text-rose-300 px-10 py-4 rounded-full font-semibold text-lg border border-rose-800/50 hover:bg-rose-900 transition-colors backdrop-blur-sm pointer-events-none"
+                                            onClick={isTouchDevice ? handleNoBtnTouch : undefined}
+                                            className="bg-rose-950/50 text-rose-300 px-10 py-4 rounded-full font-semibold text-lg border border-rose-800/50 hover:bg-rose-900 transition-colors backdrop-blur-sm touch-manipulation"
                                         >
                                             No way
                                         </button>
@@ -364,15 +601,7 @@ export const ProposalFooter: React.FC = () => {
                             className="absolute inset-0 overflow-hidden pointer-events-none"
                         >
                             {Array.from({ length: 40 }).map((_, i) => (
-                                <motion.div
-                                    key={i}
-                                    className="absolute text-rose-500/20"
-                                    initial={{ y: "100vh", x: Math.random() * 100 + "vw", scale: Math.random() * 0.5 + 0.5 }}
-                                    animate={{ y: "-10vh" }}
-                                    transition={{ duration: Math.random() * 10 + 10, repeat: Infinity, delay: Math.random() * 5 }}
-                                >
-                                    <Heart size={Math.random() * 50 + 20} fill="currentColor" />
-                                </motion.div>
+                                <FloatingHeart key={i} />
                             ))}
                         </motion.div>
 
@@ -391,34 +620,14 @@ export const ProposalFooter: React.FC = () => {
                                     initial={{ scale: 0.5, opacity: 0, filter: "blur(10px)" }}
                                     animate={{ scale: [0.5, 1.1, 1], opacity: 1, filter: "blur(0px)" }}
                                     transition={{ duration: 1.5, ease: "easeOut", delay: 0.3, times: [0, 0.7, 1] }}
-                                    className="font-script text-7xl md:text-9xl text-white mb-6 drop-shadow-[0_0_20px_rgba(244,63,94,0.6)]"
+                                    className="font-script text-6xl sm:text-7xl md:text-9xl text-white mb-6 drop-shadow-[0_0_20px_rgba(244,63,94,0.6)]"
                                 >
                                     She Said Yes!
                                 </motion.h2>
 
                                 {/* Sparkles around text */}
                                 {[...Array(6)].map((_, i) => (
-                                    <motion.div
-                                        key={i}
-                                        className="absolute text-yellow-200"
-                                        initial={{ scale: 0, opacity: 0 }}
-                                        animate={{
-                                            scale: [0, 1, 0],
-                                            opacity: [0, 1, 0],
-                                            rotate: [0, 180],
-                                            x: Math.cos(i * 60 * (Math.PI / 180)) * 200,
-                                            y: Math.sin(i * 60 * (Math.PI / 180)) * 100
-                                        }}
-                                        transition={{ duration: 2.5, delay: 1 + i * 0.2, repeat: Infinity, repeatDelay: 1 }}
-                                        style={{
-                                            left: "50%",
-                                            top: "50%",
-                                            marginLeft: -12,
-                                            marginTop: -12
-                                        }}
-                                    >
-                                        <Sparkles size={24 + Math.random() * 20} />
-                                    </motion.div>
+                                    <TextSparkle key={i} index={i} />
                                 ))}
                             </motion.div>
 
@@ -454,7 +663,7 @@ export const ProposalFooter: React.FC = () => {
             <div className="absolute bottom-4 text-rose-300/50 font-sans text-sm flex items-center gap-2">
                 <span>Made with all my heart</span>
                 <span>•</span>
-                <a href="https://github.com/yourusername/whimsical-proposal" target="_blank" rel="noopener noreferrer" className="hover:text-rose-300 transition-colors">
+                <a href="https://github.com/bharathvbcr/Whimsical-Love" target="_blank" rel="noopener noreferrer" className="hover:text-rose-300 transition-colors">
                     Open Source
                 </a>
             </div>

@@ -1,0 +1,16 @@
+{
+    "name": "Whimsical Proposal",
+    "short_name": "Proposal",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#fff1f2",
+    "theme_color": "#e11d48",
+    "description": "A beautiful, animated proposal experience.",
+    "icons": [
+        {
+            "src": "logo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}

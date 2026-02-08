@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { TypewriterText } from './TypewriterText';
-import { useContent } from '../contexts/ContentContext';
+import { useContent } from '../hooks/useContent';
 
 interface NoteProps {
   text: string;

@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Music, Volume2, VolumeX, Upload, ChevronUp, ChevronDown } from 'lucide-react';
-import { useContent } from '../contexts/ContentContext';
+import { Volume2, VolumeX, Upload, ChevronUp, ChevronDown } from 'lucide-react';
+import { useContent } from '../hooks/useContent';
 import { useExperience } from './AutoScrollContext';
 
 export const MusicPlayer: React.FC = () => {
-  const { music } = useContent();
-  const DEFAULT_AUDIO_URL = music.url;
+  const { musicConfig } = useContent();
+  const DEFAULT_AUDIO_URL = musicConfig.url;
 
   // Get audioRef from unified context
   const { audioRef, isMusicPlaying, hasStarted } = useExperience();
@@ -184,7 +184,7 @@ export const MusicPlayer: React.FC = () => {
             )}
           </div>
           <span className="font-sans text-sm font-medium hidden md:block">
-            {isPlaying ? (customAudioUrl ? music.label : music.label) : 'Play Music'}
+            {isPlaying ? (customAudioUrl ? musicConfig.label : musicConfig.label) : 'Play Music'}
           </span>
 
           {/* Visualizer bars */}

@@ -36,7 +36,7 @@ export const ConstellationSection: React.FC = () => {
     let width = canvas.width = window.innerWidth;
     let height = canvas.height = window.innerHeight;
 
-    let stars: Star[] = [];
+    const stars: Star[] = [];
     const numStars = 200;
 
     // Initialize stars
@@ -54,22 +54,41 @@ export const ConstellationSection: React.FC = () => {
     let mouseX = -1000;
     let mouseY = -1000;
 
-    const handleMouseMove = (e: MouseEvent) => {
+    // Cache container offset to avoid getBoundingClientRect every mousemove
+    let containerOffsetX = 0;
+    let containerOffsetY = 0;
+
+    const cacheContainerOffset = () => {
         if (!containerRef.current) return;
         const rect = containerRef.current.getBoundingClientRect();
-        mouseX = e.clientX - rect.left;
-        mouseY = e.clientY - rect.top;
+        containerOffsetX = rect.left;
+        containerOffsetY = rect.top;
     };
-    
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('resize', () => {
+
+    const handleMouseMove = (e: MouseEvent) => {
+        mouseX = e.clientX - containerOffsetX;
+        mouseY = e.clientY - containerOffsetY;
+    };
+
+    const handleResize = () => {
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
-    });
+        cacheContainerOffset();
+    };
+
+    // Also recache on scroll since section position changes
+    const handleScroll = () => { cacheContainerOffset(); };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    cacheContainerOffset();
+
+    let animId: number;
 
     const draw = () => {
       ctx.clearRect(0, 0, width, height);
-      
+
       // Draw Stars
       stars.forEach(star => {
         ctx.beginPath();
@@ -90,7 +109,7 @@ export const ConstellationSection: React.FC = () => {
         const dx = mouseX - star.x;
         const dy = mouseY - star.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
-        
+
         if (dist < 100) {
             ctx.beginPath();
             ctx.moveTo(star.x, star.y);
@@ -101,14 +120,16 @@ export const ConstellationSection: React.FC = () => {
         }
       });
 
-      requestAnimationFrame(draw);
+      animId = requestAnimationFrame(draw);
     };
 
-    const animId = requestAnimationFrame(draw);
+    animId = requestAnimationFrame(draw);
 
     return () => {
         cancelAnimationFrame(animId);
         window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('resize', handleResize);
+        window.removeEventListener('scroll', handleScroll);
     };
   }, []);
 
