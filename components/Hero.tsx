@@ -48,7 +48,6 @@ export const Hero: React.FC = () => {
 
   // Typewriter Logic - uses personalized phrases from content.ts
   const phrases = personalization.heroSubtitles;
-  const [textIndex, setTextIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [loopNum, setLoopNum] = useState(0);
@@ -95,8 +94,8 @@ export const Hero: React.FC = () => {
   }, [displayText, isDeleting, loopNum, phrases, typingSpeed]);
 
   // Floating Elements Logic - Hydration safe
-  const [heroFloatingElements, setHeroFloatingElements] = useState<any[]>([]);
-  const [glitterParticles, setGlitterParticles] = useState<any[]>([]);
+  const [heroFloatingElements, setHeroFloatingElements] = useState<{ id: number, left: number, top: number, size: number, duration: number, delay: number, type: number, color: string, moveX: number, moveY: number }[]>([]);
+  const [glitterParticles, setGlitterParticles] = useState<{ id: string, left: number, top: number, size: number, color: string, shape: string, duration: number, delay: number }[]>([]);
 
   useEffect(() => {
     const timer = setTimeout(() => {

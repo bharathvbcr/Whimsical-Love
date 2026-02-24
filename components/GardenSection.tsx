@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { useInView } from 'framer-motion';
 import { useAutoScroll } from './AutoScrollContext';
+import { useContent } from '../hooks/useContent';
+import { triggerHaptic } from '../lib/haptics';
 
 interface Flower {
     x: number;
@@ -14,6 +16,7 @@ interface Flower {
 }
 
 export const GardenSection: React.FC = () => {
+    const { gardenSectionContent } = useContent();
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [flowers, setFlowers] = useState<Flower[]>([]);
     const animationFrameId = useRef<number>(0);
@@ -155,6 +158,7 @@ export const GardenSection: React.FC = () => {
             growth: 0
         };
 
+        triggerHaptic('light');
         setFlowers(prev => [...prev, newFlower]);
     };
 
@@ -165,8 +169,8 @@ export const GardenSection: React.FC = () => {
             </div>
 
             <div className="max-w-4xl mx-auto px-6 text-center relative z-10 mb-8 pointer-events-none">
-                <h2 className="font-script text-5xl text-green-800 mb-2">Plant Our Garden</h2>
-                <p className="font-sans text-green-700/70">Tap anywhere to make love bloom.</p>
+                <h2 className="font-script text-5xl text-green-800 mb-2">{gardenSectionContent?.title || "Plant Our Garden"}</h2>
+                <p className="font-sans text-green-700/70">{gardenSectionContent?.subtitle || "Tap anywhere to make love bloom."}</p>
             </div>
 
             <div className="relative w-full h-[500px] border-y-4 border-green-800/10 cursor-pointer touch-none bg-white/30 backdrop-blur-sm"
@@ -178,7 +182,7 @@ export const GardenSection: React.FC = () => {
                 {flowers.length === 0 && (
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <div className="bg-white/80 px-6 py-3 rounded-full shadow-lg animate-bounce text-green-600 font-hand font-bold text-xl">
-                            Click here! 🌸
+                            {gardenSectionContent?.hintText || "Click here! 🌸"}
                         </div>
                     </div>
                 )}
@@ -186,11 +190,14 @@ export const GardenSection: React.FC = () => {
 
             <div className="text-center mt-8">
                 <button
-                    onClick={() => setFlowers([])}
+                    onClick={() => {
+                        triggerHaptic('medium');
+                        setFlowers([]);
+                    }}
                     className="flex items-center gap-2 mx-auto text-green-600 hover:text-green-800 transition-colors font-sans text-sm font-bold uppercase tracking-widest"
                 >
                     <RefreshCw size={16} />
-                    Clear Garden
+                    {gardenSectionContent?.clearText || "Clear Garden"}
                 </button>
             </div>
         </section>

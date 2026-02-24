@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useExperience } from './AutoScrollContext';
 import { useContent } from '../hooks/useContent';
 

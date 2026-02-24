@@ -112,6 +112,7 @@ export const ExperienceProvider: React.FC<{ children: React.ReactNode }> = ({ ch
     );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useExperience = () => {
     const context = useContext(ExperienceContext);
     if (!context) throw new Error("useExperience must be used within ExperienceProvider");
@@ -119,5 +120,6 @@ export const useExperience = () => {
 };
 
 // Backward compatibility alias for existing components using useAutoScroll
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAutoScroll = useExperience;
 export const AutoScrollProvider = ExperienceProvider;

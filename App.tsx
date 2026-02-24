@@ -55,7 +55,7 @@ const WaveDividerBottom = ({ fill = "fill-white" }: { fill?: string }) => (
 
 const AppContent: React.FC = () => {
     const { scrollYProgress } = useScroll();
-    const { isLoading } = useContent();
+    const { isLoading, features } = useContent();
     const scaleX = useSpring(scrollYProgress, {
         stiffness: 100,
         damping: 30,
@@ -104,62 +104,108 @@ const AppContent: React.FC = () => {
                     <div className="absolute top-0 left-0 right-0 h-32 bg-linear-to-b from-white/0 to-slate-100/0 pointer-events-none"></div>
 
                     {/* 2. Narrative Start */}
-                    <StoryBook />
+                    {features.showStoryBook !== false && <StoryBook />}
 
                     {/* 3. The History */}
-                    <MemoryTimeline />
+                    {features.showMemoryTimeline !== false && <MemoryTimeline />}
 
                     {/* Our Photos */}
-                    <PhotoGallery />
+                    {features.showPhotoGallery !== false && <PhotoGallery />}
 
-                    <WaveDividerBottom fill="fill-white" />
-                    <JourneyMap />
+                    {features.showJourneyMap !== false && (
+                        <>
+                            <WaveDividerBottom fill="fill-white" />
+                            <JourneyMap />
+                        </>
+                    )}
 
                     {/* 4. The Present - Qualities & Little Things */}
-                    <div className="bg-white">
-                        <QualitiesSection />
-                    </div>
+                    {features.showQualitiesSection !== false && (
+                        <div className="bg-white">
+                            <QualitiesSection />
+                        </div>
+                    )}
 
-                    <WaveDividerTop fill="fill-white" />
-                    <StickyNotes />
+                    {features.showStickyNotes !== false && (
+                        <>
+                            <WaveDividerTop fill="fill-white" />
+                            <StickyNotes />
+                        </>
+                    )}
 
                     {/* 5. Fun & Connection */}
-                    <LoveQuiz />
+                    {features.showLoveQuiz !== false && <LoveQuiz />}
 
-                    <WaveDividerBottom fill="fill-orange-50" />
-                    <RecipeSection />
+                    {features.showRecipeSection !== false && (
+                        <>
+                            <WaveDividerBottom fill="fill-orange-50" />
+                            <RecipeSection />
+                        </>
+                    )}
 
                     {/* 6. Deepening - Time & Universe */}
-                    <WaveDividerTop fill="fill-orange-50" />
-                    <TimeSection />
+                    {features.showTimeSection !== false && (
+                        <>
+                            <WaveDividerTop fill="fill-orange-50" />
+                            <TimeSection />
+                        </>
+                    )}
 
-                    <WaveDividerBottom fill="fill-slate-900" />
-                    <ConstellationSection />
+                    {features.showConstellationSection !== false && (
+                        <>
+                            <WaveDividerBottom fill="fill-slate-900" />
+                            <ConstellationSection />
+                        </>
+                    )}
 
                     {/* 7. The Vows */}
-                    <WaveDividerTop fill="fill-rose-900" />
-                    <div className="bg-rose-900">
-                        <PromiseSection />
-                    </div>
+                    {features.showPromiseSection !== false && (
+                        <>
+                            <WaveDividerTop fill="fill-rose-900" />
+                            <div className="bg-rose-900">
+                                <PromiseSection />
+                            </div>
+                        </>
+                    )}
 
                     {/* 8. The Future */}
-                    <WaveDividerBottom fill="fill-rose-900" />
-                    <FuturePostcard />
+                    {features.showFuturePostcard !== false && (
+                        <>
+                            <WaveDividerBottom fill="fill-rose-900" />
+                            <FuturePostcard />
+                        </>
+                    )}
 
-                    <WaveDividerBottom fill="fill-slate-50" />
-                    <FutureGallery />
+                    {features.showFutureGallery !== false && (
+                        <>
+                            <WaveDividerBottom fill="fill-slate-50" />
+                            <FutureGallery />
+                        </>
+                    )}
 
                     {/* 9. Building Together */}
-                    <WaveDividerTop fill="fill-slate-50" />
-                    <GardenSection />
+                    {features.showGardenSection !== false && (
+                        <>
+                            <WaveDividerTop fill="fill-slate-50" />
+                            <GardenSection />
+                        </>
+                    )}
 
                     {/* 10. Fun Future */}
-                    <WaveDividerBottom fill="fill-rose-50" />
-                    <DateNightSpinner />
+                    {features.showDateNightSpinner !== false && (
+                        <>
+                            <WaveDividerBottom fill="fill-rose-50" />
+                            <DateNightSpinner />
+                        </>
+                    )}
 
                     {/* 11. Final Secret */}
-                    <WaveDividerTop fill="fill-rose-50" />
-                    <ScratchCard />
+                    {features.showScratchCard !== false && (
+                        <>
+                            <WaveDividerTop fill="fill-rose-50" />
+                            <ScratchCard />
+                        </>
+                    )}
 
                 </div>
 
@@ -170,22 +216,26 @@ const AppContent: React.FC = () => {
     );
 };
 
+import { MotionConfig } from 'framer-motion';
+
 const App: React.FC = () => {
     return (
-        <ProposalConfigProvider>
-            <ContentProvider>
-                <AutoScrollProvider>
-                    <SmoothScroll>
-                        <ErrorBoundary>
-                            <KonamiCode />
-                            {/* Hidden audio element managed by context */}
-                            <AudioManager />
-                            <AppContent />
-                        </ErrorBoundary>
-                    </SmoothScroll>
-                </AutoScrollProvider>
-            </ContentProvider>
-        </ProposalConfigProvider>
+        <MotionConfig reducedMotion="user">
+            <ProposalConfigProvider>
+                <ContentProvider>
+                    <AutoScrollProvider>
+                        <SmoothScroll>
+                            <ErrorBoundary>
+                                <KonamiCode />
+                                {/* Hidden audio element managed by context */}
+                                <AudioManager />
+                                <AppContent />
+                            </ErrorBoundary>
+                        </SmoothScroll>
+                    </AutoScrollProvider>
+                </ContentProvider>
+            </ProposalConfigProvider>
+        </MotionConfig>
     );
 };
 

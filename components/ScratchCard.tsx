@@ -3,8 +3,11 @@ import { motion, useInView } from 'framer-motion';
 import { Sparkles, Eraser } from 'lucide-react';
 import { TypewriterText } from './TypewriterText';
 import { useAutoScroll } from './AutoScrollContext';
+import { useContent } from '../hooks/useContent';
+import { triggerHaptic } from '../lib/haptics';
 
 export const ScratchCard: React.FC = () => {
+  const { scratchCardContent } = useContent();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [isRevealed, setIsRevealed] = useState(false);
@@ -84,7 +87,7 @@ export const ScratchCard: React.FC = () => {
       ctx.fillStyle = '#fb7185';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
-      ctx.fillText("Rub gently to reveal a secret...", canvas.width / 2, canvas.height / 2);
+      ctx.fillText(scratchCardContent?.overlayText || "Rub gently to reveal a secret...", canvas.width / 2, canvas.height / 2);
 
       ctx.globalCompositeOperation = 'destination-out';
     };
@@ -115,16 +118,31 @@ export const ScratchCard: React.FC = () => {
       if (!isDrawing) return;
       e.preventDefault();
       const { x, y } = getPos(e);
-      // Larger brush for touch devices (50px vs 30px for mouse)
-      const brushRadius = 'touches' in e ? 50 : 30;
+      
+      const isTouch = 'touches' in e;
+      // Significantly larger brush for touch devices to make scratching easier
+      const brushRadius = isTouch ? 100 : 40;
+      
       ctx.beginPath();
       ctx.arc(x, y, brushRadius, 0, Math.PI * 2);
       ctx.fill();
-      if (Math.random() > 0.8 && !hasAutoScratched) {
+      
+      // Much more forgiving progress tracking, especially for mobile
+      const revealChance = isTouch ? 0.3 : 0.6; // More likely to register progress
+      const progressIncrement = isTouch ? 5 : 3; // Faster progress
+      const revealThreshold = isTouch ? 30 : 50; // Lower threshold to reveal
+
+      if (Math.random() > revealChance && !hasAutoScratched) {
+        // Haptic feedback while scratching
+        if (Math.random() > 0.7) triggerHaptic('light');
+        
         // Manual progress check
         setPercentCleared(prev => {
-          const next = prev + 2;
-          if (next > 60 && !isRevealed) setIsRevealed(true);
+          const next = prev + progressIncrement;
+          if (next > revealThreshold && !isRevealed) {
+            triggerHaptic('success');
+            setIsRevealed(true);
+          }
           return next;
         });
       }
@@ -152,12 +170,12 @@ export const ScratchCard: React.FC = () => {
       canvas.removeEventListener('touchmove', draw);
       canvas.removeEventListener('touchend', endDraw);
     };
-  }, [isRevealed, hasAutoScratched]);
+  }, [isRevealed, hasAutoScratched, scratchCardContent?.overlayText]);
 
   return (
     <section className="py-24 bg-white relative overflow-hidden">
       <div className="max-w-2xl mx-auto px-6 text-center">
-        <h2 className="font-script text-5xl text-rose-900 mb-12">A Little Secret</h2>
+        <h2 className="font-script text-5xl text-rose-900 mb-12">{scratchCardContent?.title || "A Little Secret"}</h2>
 
         <div ref={cardRef} className="relative w-full aspect-[4/3] md:aspect-[16/9] rounded-xl shadow-2xl overflow-hidden border-8 border-rose-100 mx-auto select-none">
           <div className="absolute inset-0 bg-rose-50 flex flex-col items-center justify-center p-8 select-none">
@@ -169,14 +187,14 @@ export const ScratchCard: React.FC = () => {
               <Sparkles className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
               <h3 className="font-hand text-3xl md:text-4xl text-rose-600 mb-4 font-bold min-h-[3em] flex items-center justify-center">
                 <TypewriterText
-                  text='"I loved you from the very first moment."'
+                  text={scratchCardContent?.revealText || '"I loved you from the very first moment."'}
                   trigger={isRevealed}
                   delay={0.5}
                   speed={40}
                 />
               </h3>
               <p className="font-sans text-slate-500">
-                (Also, you look really cute when you're focusing on scratching this card.)
+                {scratchCardContent?.revealSubtext || "(Also, you look really cute when you're focusing on scratching this card.)"}
               </p>
             </motion.div>
           </div>
@@ -191,7 +209,7 @@ export const ScratchCard: React.FC = () => {
           {!isRevealed && percentCleared < 5 && !isPlaying && (
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse z-20 bg-white/50 backdrop-blur-sm px-4 py-2 rounded-full flex items-center gap-2">
               <Eraser size={16} className="text-rose-500" />
-              <span className="text-rose-800 font-sans text-sm font-semibold">Rub here</span>
+              <span className="text-rose-800 font-sans text-sm font-semibold">{scratchCardContent?.hintText || "Rub here"}</span>
             </div>
           )}
         </div>

@@ -6,12 +6,12 @@ import { TypewriterText } from './TypewriterText';
 import { RingBox } from './RingBox';
 import { useContent } from '../hooks/useContent';
 import confetti from 'canvas-confetti';
-import { haptic } from 'ios-haptics';
+import { triggerHaptic } from '../lib/haptics';
 import { useAutoScroll } from './AutoScrollContext';
 
 // Extracted Pure Components for Animation
 const FloatingHeart: React.FC = () => {
-    const [anim, setAnim] = useState<any>(null);
+    const [anim, setAnim] = useState<{ yInitial: string, xInitial: string, scaleInitial: number, duration: number, delay: number, size: number } | null>(null);
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -326,7 +326,7 @@ export const ProposalFooter: React.FC = () => {
         noBtnRotate.set(Math.random() * 40 - 20);
 
         // Short haptic buzz for "denial" — works on iOS + Android
-        haptic();
+        triggerHaptic('light');
     };
 
     const triggerConfetti = () => {
@@ -385,16 +385,15 @@ export const ProposalFooter: React.FC = () => {
     };
 
     const vibrateHeartbeat = () => {
-        // Heartbeat: haptic.confirm() gives two rapid taps (thump-thump)
-        // Works on iOS (Taptic Engine via checkbox switch trick) and Android (Vibration API)
-        haptic.confirm();
+        // Heartbeat: gives two rapid taps (thump-thump)
+        triggerHaptic('success');
 
         // Clear any existing interval
         if (heartbeatInterval.current) clearInterval(heartbeatInterval.current);
 
         // Repeat every 1.2s for a relaxed but excited rhythm
         heartbeatInterval.current = setInterval(() => {
-            haptic.confirm();
+            triggerHaptic('success');
         }, 1200);
 
         // Stop after 15 seconds (matching confetti duration)

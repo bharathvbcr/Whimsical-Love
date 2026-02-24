@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useEffect, useState, ReactNode } from 'react';
 import * as defaultContent from '../content';
 import { db } from '../lib/firebase';
 import { doc, getDoc } from 'firebase/firestore';
@@ -83,12 +84,28 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
                         if (localData.personalization) mergedLocalContent.personalization = { ...mergedLocalContent.personalization, ...localData.personalization };
                         if (localData.themeConfig) mergedLocalContent.themeConfig = { ...mergedLocalContent.themeConfig, ...localData.themeConfig };
                         if (localData.musicConfig) mergedLocalContent.musicConfig = { ...mergedLocalContent.musicConfig, ...localData.musicConfig };
+                        if (localData.features) mergedLocalContent.features = { ...mergedLocalContent.features, ...localData.features };
+                        if (localData.photoMemories) mergedLocalContent.photoMemories = localData.photoMemories;
+                        if (localData.journeyMilestones) mergedLocalContent.journeyMilestones = localData.journeyMilestones;
+                        if (localData.storyPages) mergedLocalContent.storyPages = localData.storyPages;
+                        if (localData.timelineEvents) mergedLocalContent.timelineEvents = localData.timelineEvents;
+                        if (localData.promises) mergedLocalContent.promises = localData.promises;
+                        if (localData.stickyNotes) mergedLocalContent.stickyNotes = localData.stickyNotes;
+                        if (localData.qualities) mergedLocalContent.qualities = localData.qualities;
+                        if (localData.loveQuizQuestions) mergedLocalContent.loveQuizQuestions = localData.loveQuizQuestions;
+                        if (localData.scratchCardContent) mergedLocalContent.scratchCardContent = localData.scratchCardContent;
+                        if (localData.recipeContent) mergedLocalContent.recipeContent = localData.recipeContent;
+                        if (localData.timeSectionContent) mergedLocalContent.timeSectionContent = localData.timeSectionContent;
+                        if (localData.constellationContent) mergedLocalContent.constellationContent = localData.constellationContent;
+                        if (localData.dateNightContent) mergedLocalContent.dateNightContent = localData.dateNightContent;
+                        if (localData.futurePostcardContent) mergedLocalContent.futurePostcardContent = localData.futurePostcardContent;
+                        if (localData.gardenSectionContent) mergedLocalContent.gardenSectionContent = localData.gardenSectionContent;
 
                         setContent(mergedLocalContent);
                         setIsCustom(true);
                         console.log('Loaded local configuration');
                     }
-                } catch (e) {
+                } catch {
                     console.log('No local config found or failed to load');
                 }
 
@@ -126,6 +143,14 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
         promises: content.promises,
         stickyNotes: content.stickyNotes,
         qualities: content.qualities,
+        loveQuizQuestions: content.loveQuizQuestions,
+        scratchCardContent: content.scratchCardContent,
+        recipeContent: content.recipeContent,
+        timeSectionContent: content.timeSectionContent,
+        constellationContent: content.constellationContent,
+        dateNightContent: content.dateNightContent,
+        futurePostcardContent: content.futurePostcardContent,
+        gardenSectionContent: content.gardenSectionContent,
         musicConfig: content.musicConfig,
         content,
         isLoading,
@@ -133,7 +158,7 @@ export const ContentProvider: React.FC<ContentProviderProps> = ({ children }) =>
     };
 
     return (
-        <ContentContext.Provider value={value as any}>
+        <ContentContext.Provider value={value as unknown as ContentContextType}>
             {children}
         </ContentContext.Provider>
     );

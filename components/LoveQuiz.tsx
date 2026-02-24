@@ -1,30 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
-import { Heart, Trophy, Smile, Sparkles } from 'lucide-react';
+import { Heart, Trophy, Smile, Sparkles, Star } from 'lucide-react';
 import { useAutoScroll } from './AutoScrollContext';
+import { useContent } from '../hooks/useContent';
+import { triggerHaptic } from '../lib/haptics';
 
-const questions = [
-    {
-        id: 2,
-        text: "Who has the cutest smile?",
-        options: [
-            { text: "You do!", correct: true, message: "It lights up my world." },
-            { text: "The Dog?", correct: false, message: "Close, but no." }
-        ],
-        icon: Sparkles
-    },
-    {
-        id: 3,
-        text: "How much do I love you?",
-        options: [
-            { text: "To the moon", correct: true, message: "And back!" },
-            { text: "Infinity", correct: true, message: "And beyond!" }
-        ],
-        icon: Heart
-    }
-];
+const icons = {
+    Heart,
+    Sparkles,
+    Smile,
+    Star
+};
 
 export const LoveQuiz: React.FC = () => {
+    const { loveQuizQuestions } = useContent();
+    const questions = useMemo(() => loveQuizQuestions || [], [loveQuizQuestions]);
+    
     const [currentQ, setCurrentQ] = useState(0);
     const [isComplete, setIsComplete] = useState(false);
     const [feedback, setFeedback] = useState<string | null>(null);
@@ -78,11 +69,12 @@ export const LoveQuiz: React.FC = () => {
                 unregisterPause('quiz');
             };
         }
-    }, [isPlaying, isInView, hasAutoAnswered, isComplete, currentQ, registerPause, unregisterPause]);
+    }, [isPlaying, isInView, hasAutoAnswered, isComplete, currentQ, registerPause, unregisterPause, questions]);
 
     const handleAnswer = (correct: boolean, message: string) => {
         setFeedback(message);
         if (correct) {
+            triggerHaptic('success');
             setTimeout(() => {
                 setFeedback(null);
                 if (currentQ < questions.length - 1) {
@@ -92,6 +84,7 @@ export const LoveQuiz: React.FC = () => {
                 }
             }, 1200);
         } else {
+            triggerHaptic('error');
             setShaking(true);
             setTimeout(() => setShaking(false), 500);
         }
@@ -121,7 +114,7 @@ export const LoveQuiz: React.FC = () => {
                                 className="w-full text-center"
                             >
                                 <div className="mb-6 inline-block p-4 bg-rose-100 rounded-full text-rose-500">
-                                    {React.createElement(questions[currentQ].icon, { size: 32 })}
+                                    {React.createElement(icons[questions[currentQ].iconName], { size: 32 })}
                                 </div>
 
                                 <h3 className="font-hand text-3xl text-slate-800 mb-8 font-bold">

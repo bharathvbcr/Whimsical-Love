@@ -4,18 +4,18 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Heart, X } from 'lucide-react';
 import { useContent } from '../hooks/useContent';
 
+const konamiCode = [
+    'ArrowUp', 'ArrowUp',
+    'ArrowDown', 'ArrowDown',
+    'ArrowLeft', 'ArrowRight',
+    'ArrowLeft', 'ArrowRight',
+    'b', 'a'
+];
+
 export const KonamiCode: React.FC = () => {
     const { features } = useContent();
     const [input, setInput] = useState<string[]>([]);
     const [showModal, setShowModal] = useState(false);
-
-    const konamiCode = [
-        'ArrowUp', 'ArrowUp',
-        'ArrowDown', 'ArrowDown',
-        'ArrowLeft', 'ArrowRight',
-        'ArrowLeft', 'ArrowRight',
-        'b', 'a'
-    ];
 
     useEffect(() => {
         if (!features?.enableKonami) return;

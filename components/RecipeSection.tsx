@@ -1,32 +1,28 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Moon, Heart, Coffee, Smile, Sun, Check } from 'lucide-react';
+import { Moon, Heart, Coffee, Smile, Sun, Check, Star } from 'lucide-react';
+import { useContent } from '../hooks/useContent';
+import { triggerHaptic } from '../lib/haptics';
 
-interface Ingredient {
-  id: string;
-  label: string;
-  icon: React.ElementType;
-  color: string;
-}
-
-const ingredientsList: Ingredient[] = [
-  { id: 'trust', label: 'Unshakable Trust', icon: Check, color: 'bg-blue-100 text-blue-500' },
-  { id: 'talks', label: 'Late Night Talks', icon: Moon, color: 'bg-indigo-100 text-indigo-500' },
-  { id: 'laughs', label: 'Silly Laughter', icon: Smile, color: 'bg-yellow-100 text-yellow-500' },
-  { id: 'coffee', label: 'Morning Coffee', icon: Coffee, color: 'bg-amber-100 text-amber-600' },
-  { id: 'warmth', label: 'Endless Warmth', icon: Sun, color: 'bg-orange-100 text-orange-500' },
-];
+const icons = { Check, Moon, Smile, Coffee, Sun, Heart, Star };
 
 export const RecipeSection: React.FC = () => {
+  const { recipeContent } = useContent();
   const [added, setAdded] = useState<string[]>([]);
   const [isComplete, setIsComplete] = useState(false);
 
+  const ingredientsList = recipeContent?.ingredients || [];
+
   const handleAdd = (id: string) => {
     if (!added.includes(id)) {
+      triggerHaptic('light');
       const newAdded = [...added, id];
       setAdded(newAdded);
       if (newAdded.length === ingredientsList.length) {
-        setTimeout(() => setIsComplete(true), 1000);
+        setTimeout(() => {
+          triggerHaptic('success');
+          setIsComplete(true);
+        }, 1000);
       }
     }
   };
@@ -39,8 +35,8 @@ export const RecipeSection: React.FC = () => {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-        <h2 className="font-script text-5xl md:text-6xl text-orange-900 mb-4">Our Perfect Recipe</h2>
-        <p className="font-sans text-xl text-orange-800/60 mb-12">Let's cook up a lifetime of happiness.</p>
+        <h2 className="font-script text-5xl md:text-6xl text-orange-900 mb-4">{recipeContent?.title || "Our Perfect Recipe"}</h2>
+        <p className="font-sans text-xl text-orange-800/60 mb-12">{recipeContent?.subtitle || "Let's cook up a lifetime of happiness."}</p>
 
         <div className="flex flex-col md:flex-row items-center justify-between gap-12">
           
@@ -61,7 +57,7 @@ export const RecipeSection: React.FC = () => {
                       : 'bg-white border-white hover:border-orange-200 hover:shadow-md text-slate-700'}`}
                 >
                   <div className={`p-2 rounded-full ${isAdded ? 'bg-slate-200' : ing.color}`}>
-                    <ing.icon size={20} />
+                    {React.createElement(icons[ing.iconName as keyof typeof icons] || Check, { size: 20 })}
                   </div>
                   <span className="text-sm text-left">{ing.label}</span>
                 </motion.button>
@@ -100,7 +96,7 @@ export const RecipeSection: React.FC = () => {
                 
                 {/* Dropping Ingredients Animation */}
                 <AnimatePresence>
-                    {added.map((id, index) => {
+                    {added.map((id) => {
                         const ing = ingredientsList.find(i => i.id === id);
                         if (!ing) return null;
                         // Only show the drop animation briefly
@@ -112,7 +108,7 @@ export const RecipeSection: React.FC = () => {
                                 transition={{ duration: 0.6, ease: "easeIn" }}
                                 className={`absolute left-1/2 -translate-x-1/2 z-10 p-2 rounded-full ${ing.color}`}
                             >
-                                <ing.icon size={24} />
+                                {React.createElement(icons[ing.iconName as keyof typeof icons] || Check, { size: 24 })}
                             </motion.div>
                         );
                     })}
@@ -133,7 +129,7 @@ export const RecipeSection: React.FC = () => {
                                 <Heart size={80} className="text-rose-500 fill-rose-500 drop-shadow-lg" />
                             </motion.div>
                             <div className="bg-white px-6 py-3 rounded-xl shadow-lg border-2 border-orange-200 mt-4">
-                                <h3 className="font-hand text-2xl text-orange-600 font-bold">The Perfect Blend!</h3>
+                                <h3 className="font-hand text-2xl text-orange-600 font-bold">{recipeContent?.finalText || "The Perfect Blend!"}</h3>
                             </div>
                         </motion.div>
                     )}

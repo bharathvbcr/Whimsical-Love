@@ -89,15 +89,18 @@ It generates a `proposal.config.json` file in the `public/` directory.
 
 ### Option B: Advanced Customization (`content.ts`)
 
-For deeper customization (adding photos, specific milestones, quiz questions), edit `content.ts`. This file serves as the central configuration for the app content.
+For deeper customization (adding photos, specific milestones, editing mini-games, and toggling sections), edit `content.ts`. This file serves as the single source of truth for the entire app content—no React code editing required!
 
 **Key areas to customize:**
 
-1. **Personal Details**: Update `personalization` object.
-2. **Theme**: Change `themeConfig`.
-3. **Photos**: Add images to `public/photos/` and update `photoMemories`.
-4. **Story**: Edit `journeyMilestones`, `storyPages`, `stickyNotes`, etc.
-5. **Music**: Place your song in `public/music/` and update `musicConfig`.
+1. **Personal Details**: Update the `personalization` object.
+2. **Features**: Toggle any section on or off using the `features` object.
+3. **Theme**: Change your color palette in `themeConfig`.
+4. **Photos**: Add images to `public/photos/` and update `photoMemories`.
+5. **Story & Mini-Games**: Edit `journeyMilestones`, `storyPages`, `stickyNotes`, `loveQuizQuestions`, `dateNightContent`, `scratchCardContent`, and more.
+6. **Music**: Place your song in `public/music/` and update `musicConfig`.
+
+*Tip: You can also use `public/proposal.config.json` to override these settings without touching the code.*
 
 Refer to [CUSTOMIZATION.md](./CUSTOMIZATION.md) for a comprehensive guide.
 

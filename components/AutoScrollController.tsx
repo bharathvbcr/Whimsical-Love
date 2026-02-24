@@ -41,6 +41,7 @@ export const AutoScrollController: React.FC = () => {
         return () => {
             if (requestRef.current) cancelAnimationFrame(requestRef.current);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isPlaying, speed, isScrollPaused, lenis, config.enableAutoplay]);
 
     // Stop on manual interaction to prevent fighting the user

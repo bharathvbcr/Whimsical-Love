@@ -142,7 +142,7 @@ const GlowingOrbs: React.FC = () => {
 // --- Layer 3: Iconic Elements (Hearts, Stars) ---
 export const FloatingBackground: React.FC = () => {
   // Reduced count slightly to balance with new layers
-  const [elements, setElements] = React.useState<any[]>([]);
+  const [elements, setElements] = React.useState<{ id: number, left: string, top: string, duration: number, delay: number, scale: number, type: number }[]>([]);
 
   React.useEffect(() => {
     setElements(Array.from({ length: 15 }).map((_, i) => ({

@@ -53,6 +53,24 @@ export const features = {
 
     /** Secret message revealed by Konami code */
     konamiSecretMessage: "You found my secret hideout! I love you so much, more than all the stars in the sky. ❤️",
+
+    /** Toggle visibility of different sections to customize the length of the proposal */
+    showStoryBook: true,
+    showMemoryTimeline: true,
+    showPhotoGallery: true,
+    showJourneyMap: true,
+    showQualitiesSection: true,
+    showStickyNotes: true,
+    showLoveQuiz: true,
+    showRecipeSection: true,
+    showTimeSection: true,
+    showConstellationSection: true,
+    showPromiseSection: true,
+    showFuturePostcard: true,
+    showFutureGallery: true,
+    showGardenSection: true,
+    showDateNightSpinner: true,
+    showScratchCard: true,
 };
 
 /**
@@ -183,6 +201,84 @@ export interface Quality {
     isHighlight?: boolean;
 }
 
+export interface QuizQuestion {
+    id: number;
+    text: string;
+    options: { text: string; correct: boolean; message: string }[];
+    iconName: 'Sparkles' | 'Heart' | 'Star' | 'Smile';
+}
+
+export interface ScratchCardContent {
+    title: string;
+    revealText: string;
+    revealSubtext: string;
+    overlayText: string;
+    hintText: string;
+}
+
+export interface RecipeIngredient {
+    id: string;
+    label: string;
+    iconName: 'Check' | 'Moon' | 'Smile' | 'Coffee' | 'Sun' | 'Heart' | 'Star';
+    color: string;
+}
+
+export interface RecipeContent {
+    title: string;
+    subtitle: string;
+    finalText: string;
+    ingredients: RecipeIngredient[];
+}
+
+export interface TimeSectionContent {
+    title: string;
+    paragraph1: string;
+    highlightText: string;
+    paragraph2: string;
+    ticketText: string;
+}
+
+export interface ConstellationStar {
+    id: number;
+    x: number;
+    y: number;
+    title: string;
+    text: string;
+}
+
+export interface ConstellationContent {
+    title: string;
+    subtitle: string;
+    stars: ConstellationStar[];
+}
+
+export interface DateNightContent {
+    title: string;
+    subtitle: string;
+    buttonText: string;
+    buttonSpinText: string;
+    activities: string[];
+    foods: string[];
+    vibes: string[];
+}
+
+export interface FuturePostcardContent {
+    title: string;
+    subtitle: string;
+    date: string;
+    greeting: string;
+    paragraph1: string;
+    paragraph2: string;
+    signOff: string;
+}
+
+export interface GardenSectionContent {
+    title: string;
+    subtitle: string;
+    hintText: string;
+    clearText: string;
+}
+
 export interface MusicConfig {
     url: string;
     label: string;
@@ -191,6 +287,30 @@ export interface MusicConfig {
 // ==========================================
 // YOUR CONTENT - CUSTOMIZE BELOW
 // ==========================================
+
+/**
+ * LOVE QUIZ QUESTIONS - Fun questions for the quiz section
+ */
+export const loveQuizQuestions: QuizQuestion[] = [
+    {
+        id: 1,
+        text: "Who has the cutest smile?",
+        options: [
+            { text: "You do!", correct: true, message: "It lights up my world." },
+            { text: "The Dog?", correct: false, message: "Close, but no." }
+        ],
+        iconName: 'Sparkles'
+    },
+    {
+        id: 2,
+        text: "How much do I love you?",
+        options: [
+            { text: "To the moon", correct: true, message: "And back!" },
+            { text: "Infinity", correct: true, message: "And beyond!" }
+        ],
+        iconName: 'Heart'
+    }
+];
 
 /**
  * JOURNEY MAP - The winding path of your relationship
@@ -316,6 +436,95 @@ export const qualities: Quality[] = [
         isHighlight: true,
     },
 ];
+
+/**
+ * SCRATCH CARD - A fun interactive reveal
+ */
+export const scratchCardContent: ScratchCardContent = {
+    title: "A Little Secret",
+    revealText: "\"I loved you from the very first moment.\"",
+    revealSubtext: "(Also, you look really cute when you're focusing on scratching this card.)",
+    overlayText: "Rub gently to reveal a secret...",
+    hintText: "Rub here"
+};
+
+/**
+ * RECIPE SECTION - Ingredients for love
+ */
+export const recipeContent: RecipeContent = {
+    title: "Our Perfect Recipe",
+    subtitle: "Let's cook up a lifetime of happiness.",
+    finalText: "The Perfect Blend!",
+    ingredients: [
+        { id: 'trust', label: 'Unshakable Trust', iconName: 'Check', color: 'bg-blue-100 text-blue-500' },
+        { id: 'talks', label: 'Late Night Talks', iconName: 'Moon', color: 'bg-indigo-100 text-indigo-500' },
+        { id: 'laughs', label: 'Silly Laughter', iconName: 'Smile', color: 'bg-yellow-100 text-yellow-500' },
+        { id: 'coffee', label: 'Morning Coffee', iconName: 'Coffee', color: 'bg-amber-100 text-amber-600' },
+        { id: 'warmth', label: 'Endless Warmth', iconName: 'Sun', color: 'bg-orange-100 text-orange-500' },
+    ]
+};
+
+/**
+ * TIME SECTION - Expressing forever
+ */
+export const timeSectionContent: TimeSectionContent = {
+    title: "A Lifetime Isn't Enough",
+    paragraph1: "They say time flies, but with you, every second feels like a gift I want to hold onto forever.",
+    highlightText: "I want a million more moments.",
+    paragraph2: "Just you and me, against the world.",
+    ticketText: "You are my timeless love."
+};
+
+/**
+ * CONSTELLATION SECTION - Stars and Universe
+ */
+export const constellationContent: ConstellationContent = {
+    title: "My Universe",
+    subtitle: "In a galaxy of billions, I found the only star that matters.",
+    stars: [
+        { id: 1, x: 20, y: 30, title: "My North Star", text: "You always guide me home when I'm lost." },
+        { id: 2, x: 75, y: 25, title: "My Sun", text: "You bring warmth to my coldest days." },
+        { id: 3, x: 50, y: 60, title: "My Moon", text: "You shine brightest in my darkest hours." },
+        { id: 4, x: 80, y: 70, title: "My Universe", text: "Simply put, you are my everything." },
+        { id: 5, x: 15, y: 80, title: "My Serenity", text: "With you, the noise of the world fades away." },
+    ]
+};
+
+/**
+ * DATE NIGHT SPINNER - Fun future dates
+ */
+export const dateNightContent: DateNightContent = {
+    title: "Our Next Adventure",
+    subtitle: "I can't wait for our future. Let's pick a date right now!",
+    buttonText: "Spin For A Date!",
+    buttonSpinText: "Picking...",
+    activities: ["Stargazing Picnic", "Arcade Battle", "Sunset Beach Walk", "Movie Marathon", "Comedy Club", "Build a Fort"],
+    foods: ["Italian Bistro", "Taco Fiesta", "Sushi Boat", "Ice Cream Sundaes", "Midnight Pizza", "Fancy Cheese Board"],
+    vibes: ["Romantic", "Silly", "Cozy", "Adventures", "Lazy", "Fancy"]
+};
+
+/**
+ * FUTURE POSTCARD - A message from the future
+ */
+export const futurePostcardContent: FuturePostcardContent = {
+    title: "A Note From The Future",
+    subtitle: "I found this in our mailbox, dated 50 years from now...",
+    date: "AUG 12\n2074",
+    greeting: "My Dearest Love,",
+    paragraph1: "We just finished watching the sunset from our porch. You are still as beautiful as the day I proposed.",
+    paragraph2: "Thank you for saying \"Yes\" to this lifetime of shared adventures and endless love.",
+    signOff: "- Future Us"
+};
+
+/**
+ * GARDEN SECTION - Interactive planting
+ */
+export const gardenSectionContent: GardenSectionContent = {
+    title: "Plant Our Garden",
+    subtitle: "Tap anywhere to make love bloom.",
+    hintText: "Click here! 🌸",
+    clearText: "Clear Garden"
+};
 
 /**
  * MUSIC CONFIGURATION

@@ -174,6 +174,59 @@ export const themeConfig = {
 
 ## ✍️ Step 6: Customize Details
 
+### Section Toggles
+
+You can now toggle specific sections on and off to customize the length and flow of your proposal. In `content.ts`, adjust the `features` object:
+
+```typescript
+export const features = {
+    // Hide or show specific sections
+    showStoryBook: true,
+    showMemoryTimeline: true,
+    showPhotoGallery: true,
+    // ... and many more
+};
+```
+
+### Advanced Customization (Config File)
+
+If you prefer to configure your proposal via a JSON file (useful for integrations or avoiding code edits), you can place overrides in `public/proposal.config.json`. 
+
+You can override *any* object or array exported from `content.ts`, such as `personalization`, `features`, `photoMemories`, `storyPages`, `timelineEvents`, `stickyNotes`, `qualities`, `musicConfig`, and `themeConfig`.
+
+```json
+{
+    "personalization": {
+        "partnerName": "Sarah",
+        "yourName": "James"
+    },
+    "features": {
+        "showLoveQuiz": false
+    }
+}
+```
+
+### Interactive Sections & Mini-Games
+
+Every interactive part of the proposal can be fully personalized in `content.ts` without touching any component code. Here are some of the things you can customize:
+
+- **Love Quiz:** Set your own questions, options, and correct answers (`loveQuizQuestions`).
+- **Scratch Card:** Change the hidden message and instructions (`scratchCardContent`).
+- **Date Night Spinner:** Add your own activities, foods, and vibes (`dateNightContent`).
+- **Future Postcard:** Write your own message from the future (`futurePostcardContent`).
+- **Perfect Recipe:** Choose your own ingredients for love (`recipeContent`).
+
+```typescript
+// Example: Customizing the Scratch Card
+export const scratchCardContent = {
+    title: "A Little Secret",
+    revealText: "\"I loved you from the very first moment.\"",
+    revealSubtext: "(Also, you look really cute when you're focusing on scratching this card.)",
+    overlayText: "Rub gently to reveal a secret...",
+    hintText: "Rub here"
+};
+```
+
 ### Sticky Notes
 
 Little things you love about them:

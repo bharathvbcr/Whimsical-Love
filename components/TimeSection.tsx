@@ -2,8 +2,11 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Clock } from 'lucide-react';
 import { PhotoStack } from './PhotoStack';
+import { useContent } from '../hooks/useContent';
 
 export const TimeSection: React.FC = () => {
+  const { timeSectionContent } = useContent();
+
   return (
     <section className="py-24 relative bg-gradient-to-br from-white via-rose-50 to-white overflow-hidden">
       <div className="max-w-4xl mx-auto px-6 flex flex-col md:flex-row items-center gap-12">
@@ -37,14 +40,14 @@ export const TimeSection: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="flex-1 text-center md:text-left z-10"
         >
-            <h2 className="font-script text-5xl md:text-6xl text-rose-900 mb-6">A Lifetime Isn't Enough</h2>
+            <h2 className="font-script text-5xl md:text-6xl text-rose-900 mb-6">{timeSectionContent?.title || "A Lifetime Isn't Enough"}</h2>
             <p className="font-sans text-xl text-slate-600 leading-relaxed mb-6">
-                They say time flies, but with you, every second feels like a gift I want to hold onto forever.
-                <span className="font-bold text-rose-500 block text-2xl my-4">I want a million more moments.</span>
-                Just you and me, against the world.
+                {timeSectionContent?.paragraph1 || "They say time flies, but with you, every second feels like a gift I want to hold onto forever."}
+                <span className="font-bold text-rose-500 block text-2xl my-4">{timeSectionContent?.highlightText || "I want a million more moments."}</span>
+                {timeSectionContent?.paragraph2 || "Just you and me, against the world."}
             </p>
             <div className="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-rose-200 inline-block rotate-1 transform shadow-sm">
-                <p className="font-script text-2xl text-rose-800">You are my timeless love.</p>
+                <p className="font-script text-2xl text-rose-800">{timeSectionContent?.ticketText || "You are my timeless love."}</p>
             </div>
         </motion.div>
       </div>

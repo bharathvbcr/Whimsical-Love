@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
-import { Mail, Stamp } from 'lucide-react';
 import { useAutoScroll } from './AutoScrollContext';
+import { useContent } from '../hooks/useContent';
+import { triggerHaptic } from '../lib/haptics';
 
 export const FuturePostcard: React.FC = () => {
+    const { futurePostcardContent } = useContent();
     const [isOpen, setIsOpen] = useState(false);
 
     // Movie Mode Integration
@@ -38,8 +40,8 @@ export const FuturePostcard: React.FC = () => {
             <div className="absolute top-40 right-20 text-white/60 animate-float delay-1000"><Cloud size={120} /></div>
 
             <div className="max-w-4xl mx-auto px-6 text-center relative z-10 mb-12">
-                <h2 className="font-script text-5xl text-sky-900 mb-4">A Note From The Future</h2>
-                <p className="font-sans text-sky-700/70">I found this in our mailbox, dated 50 years from now...</p>
+                <h2 className="font-script text-5xl text-sky-900 mb-4">{futurePostcardContent?.title || "A Note From The Future"}</h2>
+                <p className="font-sans text-sky-700/70">{futurePostcardContent?.subtitle || "I found this in our mailbox, dated 50 years from now..."}</p>
             </div>
 
             <div className="relative h-[500px] w-full max-w-2xl flex items-center justify-center perspective-1000">
@@ -48,7 +50,10 @@ export const FuturePostcard: React.FC = () => {
                         <motion.div
                             key="mailbox"
                             className="cursor-pointer group relative"
-                            onClick={() => setIsOpen(true)}
+                            onClick={() => {
+                                triggerHaptic('light');
+                                setIsOpen(true);
+                            }}
                             initial={{ scale: 0.8, opacity: 0 }}
                             whileInView={{ scale: 1, opacity: 1 }}
                             whileHover={{ scale: 1.05 }}
@@ -95,8 +100,17 @@ export const FuturePostcard: React.FC = () => {
                                 <div className="w-24 h-24 border-2 border-slate-800 rounded-full flex items-center justify-center">
                                     <div className="text-center text-xs font-mono font-bold leading-tight">
                                         FUTURE POST<br />
-                                        AUG 12<br />
-                                        2074
+                                        {futurePostcardContent?.date?.split('\n').map((line, i) => (
+                                            <React.Fragment key={i}>
+                                                {line}
+                                                {i !== (futurePostcardContent?.date?.split('\n').length || 0) - 1 && <br />}
+                                            </React.Fragment>
+                                        )) || (
+                                            <>
+                                                AUG 12<br />
+                                                2074
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                                 <div className="w-32 h-4 border-t-2 border-b-2 border-slate-800 absolute top-1/2 left-full -ml-4 wave-lines"></div>
@@ -104,15 +118,15 @@ export const FuturePostcard: React.FC = () => {
 
                             <div className="flex h-full gap-8">
                                 <div className="flex-1 flex flex-col justify-center">
-                                    <h3 className="font-hand text-2xl text-slate-800 mb-6 font-bold">My Dearest Love,</h3>
+                                    <h3 className="font-hand text-2xl text-slate-800 mb-6 font-bold">{futurePostcardContent?.greeting || "My Dearest Love,"}</h3>
                                     <p className="font-hand text-lg text-slate-700 leading-relaxed mb-4">
-                                        We just finished watching the sunset from our porch. You are still as beautiful as the day I proposed.
+                                        {futurePostcardContent?.paragraph1 || "We just finished watching the sunset from our porch. You are still as beautiful as the day I proposed."}
                                     </p>
                                     <p className="font-hand text-lg text-slate-700 leading-relaxed">
-                                        Thank you for saying "Yes" to this lifetime of shared adventures and endless love.
+                                        {futurePostcardContent?.paragraph2 || "Thank you for saying \"Yes\" to this lifetime of shared adventures and endless love."}
                                     </p>
                                     <p className="font-hand text-xl text-slate-800 font-bold mt-8 text-right transform -rotate-2">
-                                        - Future Us
+                                        {futurePostcardContent?.signOff || "- Future Us"}
                                     </p>
                                 </div>
                             </div>

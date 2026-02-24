@@ -2,6 +2,7 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { TypewriterText } from './TypewriterText';
 import { Sparkles } from 'lucide-react';
+import { useContent } from '../hooks/useContent';
 
 interface Star {
   x: number;
@@ -13,13 +14,14 @@ interface Star {
 }
 
 export const ConstellationSection: React.FC = () => {
+  const { constellationContent } = useContent();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredStar, setHoveredStar] = useState<number | null>(null);
   const isInView = useInView(containerRef, { amount: 0.3 });
 
   // Interactive "Major Stars" (The constellations)
-  const constellations = [
+  const constellations = constellationContent?.stars || [
     { id: 1, x: 20, y: 30, title: "My North Star", text: "You always guide me home when I'm lost." },
     { id: 2, x: 75, y: 25, title: "My Sun", text: "You bring warmth to my coldest days." },
     { id: 3, x: 50, y: 60, title: "My Moon", text: "You shine brightest in my darkest hours." },
@@ -146,10 +148,10 @@ export const ConstellationSection: React.FC = () => {
         >
             <Sparkles className="w-12 h-12 text-yellow-200 mx-auto mb-6 animate-pulse" />
             <h2 className="font-script text-5xl md:text-7xl mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-white to-rose-200">
-                My Universe
+                {constellationContent?.title || "My Universe"}
             </h2>
             <p className="font-sans text-xl md:text-2xl text-purple-100/80 max-w-2xl mx-auto leading-relaxed">
-                In a galaxy of billions, I found the only star that matters.
+                {constellationContent?.subtitle || "In a galaxy of billions, I found the only star that matters."}
             </p>
         </motion.div>
       </div>

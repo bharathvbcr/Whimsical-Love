@@ -2,12 +2,19 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, useInView } from 'framer-motion';
 import { RefreshCw, Ticket } from 'lucide-react';
 import { useAutoScroll } from './AutoScrollContext';
+import { useContent } from '../hooks/useContent';
+import { triggerHaptic } from '../lib/haptics';
 
-const activities = ["Stargazing Picnic", "Arcade Battle", "Sunset Beach Walk", "Movie Marathon", "Comedy Club", "Build a Fort"];
-const foods = ["Italian Bistro", "Taco Fiesta", "Sushi Boat", "Ice Cream Sundaes", "Midnight Pizza", "Fancy Cheese Board"];
-const vibes = ["Romantic", "Silly", "Cozy", "Adventures", "Lazy", "Fancy"];
+const defaultActivities = ["Stargazing Picnic", "Arcade Battle", "Sunset Beach Walk", "Movie Marathon", "Comedy Club", "Build a Fort"];
+const defaultFoods = ["Italian Bistro", "Taco Fiesta", "Sushi Boat", "Ice Cream Sundaes", "Midnight Pizza", "Fancy Cheese Board"];
+const defaultVibes = ["Romantic", "Silly", "Cozy", "Adventures", "Lazy", "Fancy"];
 
 export const DateNightSpinner: React.FC = () => {
+    const { dateNightContent } = useContent();
+    const activities = dateNightContent?.activities || defaultActivities;
+    const foods = dateNightContent?.foods || defaultFoods;
+    const vibes = dateNightContent?.vibes || defaultVibes;
+
     const [result, setResult] = useState({ activity: "???", food: "???", vibe: "???" });
     const [isSpinning, setIsSpinning] = useState(false);
     const [couponGenerated, setCouponGenerated] = useState(false);
@@ -53,7 +60,7 @@ export const DateNightSpinner: React.FC = () => {
                 unregisterPause('spinner');
             };
         }
-    }, [isPlaying, isInView, hasAutoSpun, couponGenerated, isSpinning, registerPause, unregisterPause]);
+    }, [isPlaying, isInView, hasAutoSpun, couponGenerated, isSpinning, registerPause, unregisterPause, activities, foods, vibes]);
 
     const spin = () => {
         if (isSpinning) return;
@@ -62,6 +69,7 @@ export const DateNightSpinner: React.FC = () => {
 
         let count = 0;
         const interval = setInterval(() => {
+            triggerHaptic('light');
             setResult({
                 activity: activities[Math.floor(Math.random() * activities.length)],
                 food: foods[Math.floor(Math.random() * foods.length)],
@@ -70,6 +78,7 @@ export const DateNightSpinner: React.FC = () => {
             count++;
             if (count > 15) {
                 clearInterval(interval);
+                triggerHaptic('success');
                 setIsSpinning(false);
                 setCouponGenerated(true);
             }
@@ -83,8 +92,8 @@ export const DateNightSpinner: React.FC = () => {
             <div className="absolute bottom-0 right-0 w-80 h-80 bg-rose-200 rounded-full blur-3xl opacity-50 translate-x-1/2 translate-y-1/2"></div>
 
             <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-                <h2 className="font-script text-5xl md:text-6xl text-rose-900 mb-4">Our Next Adventure</h2>
-                <p className="font-sans text-xl text-slate-600 mb-12">I can't wait for our future. Let's pick a date right now!</p>
+                <h2 className="font-script text-5xl md:text-6xl text-rose-900 mb-4">{dateNightContent?.title || "Our Next Adventure"}</h2>
+                <p className="font-sans text-xl text-slate-600 mb-12">{dateNightContent?.subtitle || "I can't wait for our future. Let's pick a date right now!"}</p>
 
                 <div className="bg-white rounded-3xl shadow-2xl p-8 md:p-12 border-4 border-rose-200 relative">
                     {/* Slot Machine Display */}
@@ -112,7 +121,7 @@ export const DateNightSpinner: React.FC = () => {
                         className="bg-rose-500 text-white px-8 py-4 rounded-full font-bold text-xl shadow-lg hover:bg-rose-600 hover:shadow-rose-300/50 transition-all flex items-center justify-center gap-2 mx-auto disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <RefreshCw className={`w-6 h-6 ${isSpinning ? 'animate-spin' : ''}`} />
-                        {isSpinning ? "Picking..." : "Spin For A Date!"}
+                        {isSpinning ? (dateNightContent?.buttonSpinText || "Picking...") : (dateNightContent?.buttonText || "Spin For A Date!")}
                     </motion.button>
 
                     {/* The Coupon Result */}

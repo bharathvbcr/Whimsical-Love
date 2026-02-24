@@ -31,7 +31,7 @@ export const MusicPlayer: React.FC = () => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
-  }, [volume]);
+  }, [volume, audioRef]);
 
   const fadeAudio = (targetVolume: number, duration: number = 500): Promise<void> => {
     return new Promise((resolve) => {
